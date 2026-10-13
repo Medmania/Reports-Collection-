@@ -115,7 +115,7 @@
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Bed / CR No.
                         </button>
                     </div>
-                    <input type="text" id="patientName" required placeholder="e.g. Ramesh Kumar"
+                    <input type="text" id="patientName" required placeholder="e.g. Vidya"
                         class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
                 </div>
 
@@ -224,7 +224,24 @@
         <span class="pr-0.5">Snap Photo</span>
     </button>
 
-    <!-- Modal 1: Quick Photo Add Overlay -->
+    <!-- Modal 1: Select Test for Photo Upload -->
+    <div id="photoTestSelectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+                <h3 class="font-bold text-sm flex items-center gap-2 text-slate-800 dark:text-white">
+                    <i data-lucide="camera" class="w-4 h-4 text-emerald-500"></i> Which test is this photo for?
+                </h3>
+                <button id="closePhotoTestModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4 space-y-2" id="photoTestSelectOptions">
+                <!-- Test options rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Quick Photo Add Overlay -->
     <div id="quickPhotoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
@@ -258,7 +275,7 @@
         </div>
     </div>
 
-    <!-- Modal 2: Interactive Lightbox Modal -->
+    <!-- Modal 3: Interactive Lightbox Modal -->
     <div id="lightboxModal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex flex-col justify-between hidden select-none">
         <div class="p-4 flex items-center justify-between text-white bg-gradient-to-b from-black/80 to-transparent z-10">
             <div>
@@ -296,7 +313,7 @@
         </div>
     </div>
 
-    <!-- Modal 3: Test Dropdown Manager Modal -->
+    <!-- Modal 4: Test Dropdown Manager Modal -->
     <div id="testManagerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[85vh]">
             <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
@@ -335,7 +352,7 @@
         </div>
     </div>
 
-    <!-- Modal 4: Edit Task Modal -->
+    <!-- Modal 5: Edit Task Modal -->
     <div id="editTaskModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
@@ -429,7 +446,22 @@
                     const tx = db.transaction('tasks', 'readonly');
                     const store = tx.objectStore('tasks');
                     const req = store.getAll();
-                    req.onsuccess = () => resolve(req.result || []);
+                    req.onsuccess = () => {
+                        const rawTasks = req.result || [];
+                        // Ensure legacy string tests are converted to objects with individual statuses
+                        const formattedTasks = rawTasks.map(t => {
+                            if (Array.isArray(t.tests)) {
+                                t.tests = t.tests.map(testObj => {
+                                    if (typeof testObj === 'string') {
+                                        return { name: testObj, status: t.status || STATUS_TYPES.AWAITED };
+                                    }
+                                    return testObj;
+                                });
+                            }
+                            return t;
+                        });
+                        resolve(formattedTasks);
+                    };
                     req.onerror = () => resolve([]);
                 } catch(e) { resolve([]); }
             });
@@ -558,7 +590,7 @@
                     const dateStr = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
                     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                    const line1Text = `PATIENT: ${patientName.toUpperCase()} | STATUS: COLLECTED`;
+                    const line1Text = `PATIENT: ${patientName.toUpperCase()} | REPORT SNAP`;
                     const line2Text = `${dateStr} ${timeStr} ${additionalInfo ? '| ' + additionalInfo : ''} | Intern Report Tracker`;
 
                     const fontSizeLine1 = Math.max(16, Math.round(bannerHeight * 0.32));
@@ -608,6 +640,7 @@
         let zoomScale = 1;
         let rotationAngle = 0;
         let activeTaskCameraId = null;
+        let activeSelectedTestForPhoto = null;
 
         // DOM Elements
         const patientNameInput = document.getElementById('patientName');
@@ -623,6 +656,10 @@
         const addPatientForm = document.getElementById('addPatientForm');
         const taskListContainer = document.getElementById('taskList');
         const emptyState = document.getElementById('emptyState');
+
+        const photoTestSelectModal = document.getElementById('photoTestSelectModal');
+        const photoTestSelectOptions = document.getElementById('photoTestSelectOptions');
+        const closePhotoTestModalBtn = document.getElementById('closePhotoTestModalBtn');
 
         const quickCbcBtn = document.getElementById('quickCbcBtn');
         const quickBuseBtn = document.getElementById('quickBuseBtn');
@@ -695,6 +732,19 @@
             }
         });
 
+        function calculateOverallTaskStatus(task) {
+            if (!task.tests || task.tests.length === 0) return STATUS_TYPES.AWAITED;
+            const statuses = task.tests.map(t => typeof t === 'string' ? STATUS_TYPES.AWAITED : t.status);
+            
+            const allCollected = statuses.every(s => s === STATUS_TYPES.COLLECTED);
+            if (allCollected) return STATUS_TYPES.COLLECTED;
+
+            const allNoEntry = statuses.every(s => s === STATUS_TYPES.NO_ENTRY);
+            if (allNoEntry) return STATUS_TYPES.NO_ENTRY;
+
+            return STATUS_TYPES.AWAITED;
+        }
+
         function initMasterTests() {
             const saved = localStorage.getItem('intern_master_tests');
             if (saved) {
@@ -749,6 +799,10 @@
             quickPhotoModal.classList.add('hidden');
         });
 
+        closePhotoTestModalBtn.addEventListener('click', () => {
+            photoTestSelectModal.classList.add('hidden');
+        });
+
         triggerQuickCameraBtn.addEventListener('click', () => {
             const name = quickPatientName.value.trim();
             if (!name) {
@@ -756,12 +810,58 @@
                 return;
             }
             activeTaskCameraId = 'QUICK_ADD';
+            activeSelectedTestForPhoto = null;
             generalCameraInput.click();
         });
 
         window.triggerCameraForTask = function(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
             activeTaskCameraId = taskId;
-            generalCameraInput.click();
+
+            // If task has multiple tests, prompt user which test this photo is for!
+            if (task.tests && task.tests.length > 1) {
+                photoTestSelectOptions.innerHTML = '';
+
+                task.tests.forEach(testObj => {
+                    const testName = typeof testObj === 'string' ? testObj : testObj.name;
+                    const testStatus = typeof testObj === 'string' ? STATUS_TYPES.AWAITED : testObj.status;
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'w-full py-2.5 px-3 bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 rounded-xl text-xs font-semibold text-left flex items-center justify-between text-slate-800 dark:text-slate-100 active-touch transition border border-slate-200 dark:border-slate-600';
+                    btn.innerHTML = `
+                        <span>${escapeHtml(testName)}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-md ${
+                            testStatus === STATUS_TYPES.COLLECTED ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                        }">${testStatus}</span>
+                    `;
+                    btn.addEventListener('click', () => {
+                        activeSelectedTestForPhoto = testName;
+                        photoTestSelectModal.classList.add('hidden');
+                        generalCameraInput.click();
+                    });
+                    photoTestSelectOptions.appendChild(btn);
+                });
+
+                // Option for All Tests in 1 photo
+                const allBtn = document.createElement('button');
+                allBtn.type = 'button';
+                allBtn.className = 'w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold text-center active-touch transition shadow-sm mt-1';
+                allBtn.textContent = '📷 Photo covers ALL listed tests';
+                allBtn.addEventListener('click', () => {
+                    activeSelectedTestForPhoto = 'ALL';
+                    photoTestSelectModal.classList.add('hidden');
+                    generalCameraInput.click();
+                });
+                photoTestSelectOptions.appendChild(allBtn);
+
+                photoTestSelectModal.classList.remove('hidden');
+            } else {
+                activeSelectedTestForPhoto = (task.tests && task.tests[0]) ? (typeof task.tests[0] === 'string' ? task.tests[0] : task.tests[0].name) : 'ALL';
+                generalCameraInput.click();
+            }
         };
 
         generalCameraInput.addEventListener('change', async (e) => {
@@ -784,7 +884,7 @@
                         patientName: patientName,
                         crNo: '',
                         bedNo: '',
-                        tests: extraNote ? extraNote.split(',').map(s => s.trim()) : ['Quick Photo Report'],
+                        tests: extraNote ? extraNote.split(',').map(s => ({ name: s.trim(), status: STATUS_TYPES.COLLECTED })) : [{ name: 'Quick Photo Report', status: STATUS_TYPES.COLLECTED }],
                         status: STATUS_TYPES.COLLECTED,
                         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     };
@@ -796,8 +896,19 @@
                     task = tasks.find(t => t.id === activeTaskCameraId);
                     if (task) {
                         patientName = task.patientName;
-                        extraNote = task.tests.join(', ');
-                        task.status = STATUS_TYPES.COLLECTED;
+
+                        if (activeSelectedTestForPhoto === 'ALL' || !activeSelectedTestForPhoto) {
+                            task.tests.forEach(t => t.status = STATUS_TYPES.COLLECTED);
+                            extraNote = task.tests.map(t => t.name).join(', ');
+                        } else {
+                            const targetTest = task.tests.find(t => t.name === activeSelectedTestForPhoto);
+                            if (targetTest) {
+                                targetTest.status = STATUS_TYPES.COLLECTED;
+                            }
+                            extraNote = activeSelectedTestForPhoto;
+                        }
+
+                        task.status = calculateOverallTaskStatus(task);
                         await dbSaveTask(task);
                     }
                 }
@@ -809,6 +920,7 @@
                 const photoObj = {
                     id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
                     taskId: task ? task.id : 'unassigned',
+                    testName: activeSelectedTestForPhoto || '',
                     blob: watermarkedBlob,
                     timestamp: new Date().toISOString()
                 };
@@ -908,42 +1020,48 @@
             }
         });
 
-        // Clean WhatsApp Handover Text Generator (omitting N/A beds and photo counters)
+        // Exact Per-Test Breakdown WhatsApp Handover Generator
         async function buildHandoverText() {
             if (tasks.length === 0) return '';
             const today = new Date().toLocaleDateString([], { month: 'short', day: 'numeric' });
             let text = `📋 *LAB / RADIOLOGY REPORT HANDOVER* (${today})\n`;
             text += `------------------------------------\n\n`;
 
-            const awaitedTasks = tasks.filter(t => t.status === STATUS_TYPES.AWAITED);
-            const noEntryTasks = tasks.filter(t => t.status === STATUS_TYPES.NO_ENTRY);
-            const collectedTasks = tasks.filter(t => t.status === STATUS_TYPES.COLLECTED);
+            const collectedItems = [];
+            const awaitedItems = [];
+            const noEntryItems = [];
 
-            if (awaitedTasks.length > 0) {
-                text += `🟡 *REPORTS AWAITED (${awaitedTasks.length}):*\n`;
-                awaitedTasks.forEach(t => {
-                    const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
-                    text += `• *${t.patientName}*${bedStr}: ${t.tests.join(', ')}\n`;
-                });
-                text += `\n`;
-            }
+            tasks.forEach(t => {
+                const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
 
-            if (noEntryTasks.length > 0) {
-                text += `🔴 *NO ENTRY / REJECTED (${noEntryTasks.length}):*\n`;
-                noEntryTasks.forEach(t => {
-                    const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
-                    text += `• *${t.patientName}*${bedStr}: ${t.tests.join(', ')}\n`;
-                });
-                text += `\n`;
-            }
+                const colForTask = t.tests.filter(x => x.status === STATUS_TYPES.COLLECTED).map(x => x.name);
+                const awkForTask = t.tests.filter(x => x.status === STATUS_TYPES.AWAITED).map(x => x.name);
+                const noeForTask = t.tests.filter(x => x.status === STATUS_TYPES.NO_ENTRY).map(x => x.name);
 
-            if (collectedTasks.length > 0) {
-                text += `🟢 *COLLECTED (${collectedTasks.length}):*\n`;
-                for (const t of collectedTasks) {
-                    const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
-                    text += `• *${t.patientName}*${bedStr}: ${t.tests.join(', ')}\n`;
+                if (colForTask.length > 0) {
+                    collectedItems.push(`• *${t.patientName}*${bedStr}: ${colForTask.join(', ')}`);
                 }
-                text += `\n`;
+                if (awkForTask.length > 0) {
+                    awaitedItems.push(`• *${t.patientName}*${bedStr}: ${awkForTask.join(', ')}`);
+                }
+                if (noeForTask.length > 0) {
+                    noEntryItems.push(`• *${t.patientName}*${bedStr}: ${noeForTask.join(', ')}`);
+                }
+            });
+
+            if (awaitedItems.length > 0) {
+                text += `🟡 *REPORTS AWAITED (${awaitedItems.length}):*\n`;
+                text += awaitedItems.join('\n') + `\n\n`;
+            }
+
+            if (noEntryItems.length > 0) {
+                text += `🔴 *NO ENTRY / REJECTED (${noEntryItems.length}):*\n`;
+                text += noEntryItems.join('\n') + `\n\n`;
+            }
+
+            if (collectedItems.length > 0) {
+                text += `🟢 *COLLECTED (${collectedItems.length}):*\n`;
+                text += collectedItems.join('\n') + `\n\n`;
             }
 
             text += `------------------------------------`;
@@ -1102,7 +1220,7 @@
                 patientName: name,
                 crNo: cr || '',
                 bedNo: bed || '',
-                tests: [...selectedFormTests],
+                tests: selectedFormTests.map(t => ({ name: t, status: STATUS_TYPES.AWAITED })),
                 status: STATUS_TYPES.AWAITED,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
@@ -1121,16 +1239,37 @@
             showToast('Patient added to collection list!');
         });
 
+        window.toggleIndividualTestStatus = async function(taskId, testIndex) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task || !task.tests[testIndex]) return;
+
+            const current = task.tests[testIndex].status;
+            let next = STATUS_TYPES.COLLECTED;
+            if (current === STATUS_TYPES.AWAITED) next = STATUS_TYPES.COLLECTED;
+            else if (current === STATUS_TYPES.COLLECTED) next = STATUS_TYPES.NO_ENTRY;
+            else if (current === STATUS_TYPES.NO_ENTRY) next = STATUS_TYPES.AWAITED;
+
+            task.tests[testIndex].status = next;
+            task.status = calculateOverallTaskStatus(task);
+
+            await dbSaveTask(task);
+            await renderTaskList();
+            showToast(`${task.tests[testIndex].name}: ${next}`);
+        };
+
         async function renderTaskList() {
             taskListContainer.innerHTML = '';
 
             const filteredTasks = tasks.filter(task => {
-                const matchesFilter = (currentFilter === 'all') || (task.status === currentFilter);
+                const overallStatus = calculateOverallTaskStatus(task);
+                const matchesFilter = (currentFilter === 'all') || 
+                                      (task.tests.some(t => t.status === currentFilter)) ||
+                                      (overallStatus === currentFilter);
                 const query = searchQuery.toLowerCase();
                 const matchesSearch = task.patientName.toLowerCase().includes(query) ||
                                       (task.crNo && task.crNo.toLowerCase().includes(query)) ||
                                       (task.bedNo && task.bedNo.toLowerCase().includes(query)) ||
-                                      task.tests.some(t => t.toLowerCase().includes(query));
+                                      task.tests.some(t => t.name.toLowerCase().includes(query));
                 return matchesFilter && matchesSearch;
             });
 
@@ -1145,16 +1284,17 @@
                 const card = document.createElement('div');
                 const photos = await dbGetPhotosForTask(task.id);
 
+                const overallStatus = calculateOverallTaskStatus(task);
                 let statusBgClass = '';
                 let statusBadgeClass = '';
 
-                if (task.status === STATUS_TYPES.AWAITED) {
+                if (overallStatus === STATUS_TYPES.AWAITED) {
                     statusBgClass = 'border-l-4 border-l-amber-500 bg-white dark:bg-slate-800';
                     statusBadgeClass = 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800';
-                } else if (task.status === STATUS_TYPES.COLLECTED) {
+                } else if (overallStatus === STATUS_TYPES.COLLECTED) {
                     statusBgClass = 'border-l-4 border-l-emerald-500 bg-emerald-50/20 dark:bg-slate-800/80';
                     statusBadgeClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
-                } else if (task.status === STATUS_TYPES.NO_ENTRY) {
+                } else if (overallStatus === STATUS_TYPES.NO_ENTRY) {
                     statusBgClass = 'border-l-4 border-l-rose-500 bg-rose-50/20 dark:bg-slate-800';
                     statusBadgeClass = 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border-rose-200 dark:border-rose-800';
                 }
@@ -1195,7 +1335,7 @@
                             <div class="flex items-center gap-2">
                                 <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">${escapeHtml(task.patientName)}</h3>
                                 <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${statusBadgeClass} border">
-                                    ${task.status}
+                                    ${overallStatus}
                                 </span>
                             </div>
                             ${subDetailsHTML}
@@ -1214,22 +1354,36 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap gap-1.5">
-                        ${task.tests.map(test => `
-                            <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-md border border-slate-200/60 dark:border-slate-600/60">
-                                ${escapeHtml(test)}
-                            </span>
-                        `).join('')}
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-semibold text-slate-400">Tap test chip to toggle status:</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${task.tests.map((test, idx) => {
+                                let chipClass = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-200 dark:border-amber-800';
+                                if (test.status === STATUS_TYPES.COLLECTED) {
+                                    chipClass = 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-200 dark:border-emerald-800';
+                                } else if (test.status === STATUS_TYPES.NO_ENTRY) {
+                                    chipClass = 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-800';
+                                }
+                                return `
+                                    <button onclick="toggleIndividualTestStatus('${task.id}',${idx})" 
+                                        class="px-2.5 py-1 text-xs font-semibold rounded-lg border transition active-touch flex items-center gap-1 ${chipClass}"
+                                        title="Tap to change status">
+                                        <span>${escapeHtml(test.name)}</span>
+                                        <span class="text-[9px] opacity-75 font-normal">(${test.status})</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
 
                     ${photosThumbnailsHTML}
 
                     <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-1">
-                        <span class="text-[11px] font-semibold text-slate-400">Status:</span>
+                        <span class="text-[11px] font-semibold text-slate-400">Mark All As:</span>
                         <div class="flex items-center gap-1">
                             <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.AWAITED}')"
                                 class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.AWAITED
+                                    overallStatus === STATUS_TYPES.AWAITED
                                     ? 'bg-amber-500 text-white shadow-sm font-semibold'
                                     : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/40'
                                 }">
@@ -1238,7 +1392,7 @@
 
                             <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.COLLECTED}')"
                                 class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.COLLECTED
+                                    overallStatus === STATUS_TYPES.COLLECTED
                                     ? 'bg-emerald-600 text-white shadow-sm font-semibold'
                                     : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/40'
                                 }">
@@ -1247,7 +1401,7 @@
 
                             <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.NO_ENTRY}')"
                                 class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.NO_ENTRY
+                                    overallStatus === STATUS_TYPES.NO_ENTRY
                                     ? 'bg-rose-600 text-white shadow-sm font-semibold'
                                     : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-rose-100 dark:hover:bg-rose-950/40'
                                 }">
@@ -1267,9 +1421,10 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.status = newStatus;
+                task.tests.forEach(t => t.status = newStatus);
                 await dbSaveTask(task);
                 await renderTaskList();
-                showToast(`Status updated: ${newStatus}`);
+                showToast(`All tests marked: ${newStatus}`);
             }
         };
 
@@ -1288,7 +1443,7 @@
             editPatientName.value = task.patientName;
             editBedNo.value = (task.bedNo && task.bedNo !== 'N/A') ? task.bedNo : '';
             editCrNo.value = (task.crNo && task.crNo !== 'N/A') ? task.crNo : '';
-            editTestsString.value = task.tests.join(', ');
+            editTestsString.value = task.tests.map(t => t.name).join(', ');
 
             editTaskModal.classList.remove('hidden');
         };
@@ -1302,8 +1457,14 @@
                 task.patientName = editPatientName.value.trim();
                 task.bedNo = editBedNo.value.trim();
                 task.crNo = editCrNo.value.trim();
-                task.tests = editTestsString.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
 
+                const newTestNames = editTestsString.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                task.tests = newTestNames.map(name => {
+                    const existing = task.tests.find(t => t.name === name);
+                    return existing || { name: name, status: STATUS_TYPES.AWAITED };
+                });
+
+                task.status = calculateOverallTaskStatus(task);
                 await dbSaveTask(task);
                 await renderTaskList();
                 editTaskModal.classList.add('hidden');
@@ -1315,15 +1476,15 @@
         cancelEditBtn.addEventListener('click', () => editTaskModal.classList.add('hidden'));
 
         clearCompletedBtn.addEventListener('click', async () => {
-            const collected = tasks.filter(t => t.status === STATUS_TYPES.COLLECTED);
+            const collected = tasks.filter(t => calculateOverallTaskStatus(t) === STATUS_TYPES.COLLECTED);
             if (collected.length === 0) {
-                showToast('No collected tasks to clear');
+                showToast('No fully collected tasks to clear');
                 return;
             }
             for (const t of collected) {
                 await dbDeleteTask(t.id);
             }
-            tasks = tasks.filter(t => t.status !== STATUS_TYPES.COLLECTED);
+            tasks = tasks.filter(t => calculateOverallTaskStatus(t) !== STATUS_TYPES.COLLECTED);
             await renderTaskList();
             showToast('Collected tasks cleared');
         });
