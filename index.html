@@ -13,7 +13,7 @@
     <meta name="apple-mobile-web-app-title" content="Report Tracker">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063176.png">
 
-    <!-- Base64 Inline Web App Manifest for Chrome Android & Safari Home Screen Install -->
+    <!-- Base64 Inline Web App Manifest -->
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiSW50ZXJuIExhYiBSZXBvcnQgVHJhY2tlciIsInNob3J0X25hbWUiOiJSZXBvcnQgVHJhY2tlciIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSI6ImJhY2tncm91bmRfY29sb3IiOiIjMGYxNzJhIiwidGhlbWVfY29sb3IiOiIjMTBiOTgxIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzMwNjMvMzA2MzE3Ni5wbmciLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ==">
 
     <!-- CDN Dependencies: Tailwind CSS & Lucide Icons -->
@@ -62,7 +62,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 pb-16 select-none">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 pb-20 select-none">
 
     <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-4 py-2.5 shadow-sm">
         <div class="max-w-xl mx-auto flex items-center justify-between">
@@ -391,7 +391,7 @@
         let db = null;
 
         function openDatabase() {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 try {
                     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -524,7 +524,6 @@
                 };
 
                 img.onload = () => {
-                    // Maximum resolution bound to ensure canvas memory safety while keeping macro detail
                     const maxDim = 2048;
                     let width = img.naturalWidth || img.width;
                     let height = img.naturalHeight || img.height;
@@ -544,21 +543,17 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
 
-                    // 1. Draw raw high-res camera picture
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // 2. Draw dark translucent bottom banner
                     const bannerHeight = Math.max(70, Math.round(height * 0.08));
                     const bannerY = height - bannerHeight;
 
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)'; // Deep Slate dark background
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
                     ctx.fillRect(0, bannerY, width, bannerHeight);
 
-                    // Accent stripe at top of banner
-                    ctx.fillStyle = '#10b981'; // Emerald accent
+                    ctx.fillStyle = '#10b981';
                     ctx.fillRect(0, bannerY, width, Math.max(4, Math.round(bannerHeight * 0.05)));
 
-                    // 3. Draw Watermark Typography
                     const now = new Date();
                     const dateStr = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
                     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -571,17 +566,14 @@
 
                     ctx.textBaseline = 'middle';
                     
-                    // Line 1 (Main Patient Banner)
                     ctx.font = `bold ${fontSizeLine1}px sans-serif`;
                     ctx.fillStyle = '#ffffff';
                     ctx.fillText(line1Text, Math.round(width * 0.03), bannerY + Math.round(bannerHeight * 0.35));
 
-                    // Line 2 (Timestamp & Subtitle)
                     ctx.font = `${fontSizeLine2}px sans-serif`;
-                    ctx.fillStyle = '#cbd5e1'; // slate-300
+                    ctx.fillStyle = '#cbd5e1';
                     ctx.fillText(line2Text, Math.round(width * 0.03), bannerY + Math.round(bannerHeight * 0.72));
 
-                    // 4. Output watermarked JPEG Blob
                     canvas.toBlob((blob) => {
                         if (blob) resolve(blob);
                         else reject(new Error('Canvas blob generation failed'));
@@ -612,7 +604,6 @@
         let currentFilter = 'all';
         let searchQuery = '';
 
-        // Lightbox state
         let currentActivePhotoId = null;
         let zoomScale = 1;
         let rotationAngle = 0;
@@ -697,17 +688,9 @@
             await renderTaskList();
             lucide.createIcons();
 
-            // Ultra-safe SW registration to prevent Chrome/GitHub pages crashing
             if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
                 try {
-                    const swCode = `
-                        self.addEventListener('install', e => self.skipWaiting());
-                        self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                        self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-                    `;
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const blobUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(blobUrl).catch(() => {});
+                    navigator.serviceWorker.register('./sw.js').catch(() => {});
                 } catch(e) {}
             }
         });
@@ -740,7 +723,6 @@
         async function initTasksAndMigrate() {
             tasks = await dbGetAllTasks();
 
-            // Migration from legacy localStorage format if present
             const oldLocalData = localStorage.getItem('intern_tasks');
             if (oldLocalData) {
                 try {
@@ -797,12 +779,11 @@
                     patientName = quickPatientName.value.trim() || 'Patient';
                     extraNote = quickTestsNote.value.trim() || 'Report';
 
-                    // Create new task on the fly
                     task = {
                         id: Date.now().toString(),
                         patientName: patientName,
-                        crNo: 'N/A',
-                        bedNo: 'N/A',
+                        crNo: '',
+                        bedNo: '',
                         tests: extraNote ? extraNote.split(',').map(s => s.trim()) : ['Quick Photo Report'],
                         status: STATUS_TYPES.COLLECTED,
                         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -816,14 +797,13 @@
                     if (task) {
                         patientName = task.patientName;
                         extraNote = task.tests.join(', ');
-                        task.status = STATUS_TYPES.COLLECTED; // Auto switch status to Collected
+                        task.status = STATUS_TYPES.COLLECTED;
                         await dbSaveTask(task);
                     }
                 }
 
                 if (!patientName) patientName = 'Patient';
 
-                // Process Watermark Canvas
                 const watermarkedBlob = await watermarkImage(file, patientName, extraNote);
 
                 const photoObj = {
@@ -841,7 +821,7 @@
                 showToast('Error watermarking image');
             }
 
-            generalCameraInput.value = ''; // Reset input
+            generalCameraInput.value = '';
         });
 
         window.openLightbox = async function(photoId, patientName) {
@@ -928,6 +908,7 @@
             }
         });
 
+        // Clean WhatsApp Handover Text Generator (omitting N/A beds and photo counters)
         async function buildHandoverText() {
             if (tasks.length === 0) return '';
             const today = new Date().toLocaleDateString([], { month: 'short', day: 'numeric' });
@@ -941,7 +922,8 @@
             if (awaitedTasks.length > 0) {
                 text += `🟡 *REPORTS AWAITED (${awaitedTasks.length}):*\n`;
                 awaitedTasks.forEach(t => {
-                    text += `• *${t.patientName}* (Bed: ${t.bedNo} | CR: ${t.crNo}): ${t.tests.join(', ')}\n`;
+                    const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
+                    text += `• *${t.patientName}*${bedStr}: ${t.tests.join(', ')}\n`;
                 });
                 text += `\n`;
             }
@@ -949,7 +931,8 @@
             if (noEntryTasks.length > 0) {
                 text += `🔴 *NO ENTRY / REJECTED (${noEntryTasks.length}):*\n`;
                 noEntryTasks.forEach(t => {
-                    text += `• *${t.patientName}* (Bed: ${t.bedNo}): ${t.tests.join(', ')}\n`;
+                    const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
+                    text += `• *${t.patientName}*${bedStr}: ${t.tests.join(', ')}\n`;
                 });
                 text += `\n`;
             }
@@ -957,15 +940,13 @@
             if (collectedTasks.length > 0) {
                 text += `🟢 *COLLECTED (${collectedTasks.length}):*\n`;
                 for (const t of collectedTasks) {
-                    const photos = await dbGetPhotosForTask(t.id);
-                    const photoTag = photos.length > 0 ? ` [${photos.length} Watermarked Photo(s) 📷]` : '';
-                    text += `• *${t.patientName}* (Bed: ${t.bedNo}): ${t.tests.join(', ')}${photoTag}\n`;
+                    const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
+                    text += `• *${t.patientName}*${bedStr}: ${t.tests.join(', ')}\n`;
                 }
                 text += `\n`;
             }
 
-            text += `------------------------------------\n`;
-            text += `_Sent via Intern Lab Report Tracker_`;
+            text += `------------------------------------`;
             return text;
         }
 
@@ -1119,8 +1100,8 @@
             const newTask = {
                 id: Date.now().toString(),
                 patientName: name,
-                crNo: cr || 'N/A',
-                bedNo: bed || 'N/A',
+                crNo: cr || '',
+                bedNo: bed || '',
                 tests: [...selectedFormTests],
                 status: STATUS_TYPES.AWAITED,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -1147,8 +1128,8 @@
                 const matchesFilter = (currentFilter === 'all') || (task.status === currentFilter);
                 const query = searchQuery.toLowerCase();
                 const matchesSearch = task.patientName.toLowerCase().includes(query) ||
-                                      task.crNo.toLowerCase().includes(query) ||
-                                      task.bedNo.toLowerCase().includes(query) ||
+                                      (task.crNo && task.crNo.toLowerCase().includes(query)) ||
+                                      (task.bedNo && task.bedNo.toLowerCase().includes(query)) ||
                                       task.tests.some(t => t.toLowerCase().includes(query));
                 return matchesFilter && matchesSearch;
             });
@@ -1203,6 +1184,11 @@
                     `;
                 }
 
+                const bedCrParts = [];
+                if (task.bedNo && task.bedNo !== 'N/A') bedCrParts.push(`Bed: ${task.bedNo}`);
+                if (task.crNo && task.crNo !== 'N/A') bedCrParts.push(`CR: ${task.crNo}`);
+                const subDetailsHTML = bedCrParts.length > 0 ? `<div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(bedCrParts.join(' • '))}</div>` : '';
+
                 card.innerHTML = `
                     <div class="flex items-start justify-between gap-2">
                         <div>
@@ -1212,11 +1198,7 @@
                                     ${task.status}
                                 </span>
                             </div>
-                            <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                <span><strong class="font-medium">Bed:</strong> ${escapeHtml(task.bedNo)}</span>
-                                <span>•</span>
-                                <span><strong class="font-medium">CR:</strong> ${escapeHtml(task.crNo)}</span>
-                            </div>
+                            ${subDetailsHTML}
                         </div>
 
                         <div class="flex items-center gap-1">
@@ -1304,8 +1286,8 @@
 
             editTaskId.value = task.id;
             editPatientName.value = task.patientName;
-            editBedNo.value = task.bedNo;
-            editCrNo.value = task.crNo;
+            editBedNo.value = (task.bedNo && task.bedNo !== 'N/A') ? task.bedNo : '';
+            editCrNo.value = (task.crNo && task.crNo !== 'N/A') ? task.crNo : '';
             editTestsString.value = task.tests.join(', ');
 
             editTaskModal.classList.remove('hidden');
@@ -1318,8 +1300,8 @@
 
             if (task) {
                 task.patientName = editPatientName.value.trim();
-                task.bedNo = editBedNo.value.trim() || 'N/A';
-                task.crNo = editCrNo.value.trim() || 'N/A';
+                task.bedNo = editBedNo.value.trim();
+                task.crNo = editCrNo.value.trim();
                 task.tests = editTestsString.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
 
                 await dbSaveTask(task);
