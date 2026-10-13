@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Intern Lab Report Tracker</title>
-    
+
     <!-- PWA & Mobile Meta Tags -->
     <meta name="theme-color" content="#10b981">
     <meta name="mobile-web-app-capable" content="yes">
@@ -13,14 +13,13 @@
     <meta name="apple-mobile-web-app-title" content="Report Tracker">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063176.png">
 
-    <!-- Inline Web App Manifest Data URI -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Intern Lab Report Tracker","short_name":"Report Tracker","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#10b981","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3063/3063176.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
+    <!-- Base64 Inline Web App Manifest for Chrome Android & Safari Home Screen Install -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiSW50ZXJuIExhYiBSZXBvcnQgVHJhY2tlciIsInNob3J0X25hbWUiOiJSZXBvcnQgVHJhY2tlciIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSI6ImJhY2tncm91bmRfY29sb3IiOiIjMGYxNzJhIiwidGhlbWVfY29sb3IiOiIjMTBiOTgxIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzMwNjMvMzA2MzE3Ni5wbmciLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ==">
 
-    <!-- Tailwind CSS CDN -->
+    <!-- CDN Dependencies: Tailwind CSS & Lucide Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -54,7 +53,6 @@
             background: rgba(0,0,0,0.2);
             border-radius: 4px;
         }
-        /* Custom image zoom container styling */
         .zoom-container {
             touch-action: none;
             cursor: grab;
@@ -79,16 +77,16 @@
                     </h1>
                     <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <span id="networkIndicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span id="networkText">Offline HD Storage</span>
+                        <span id="networkText">Offline Watermark Engine</span>
                     </p>
                 </div>
             </div>
-            
+
             <div class="flex items-center gap-1.5">
                 <button id="manageTestsBtn" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs flex items-center gap-1 font-medium transition active-touch" title="Manage Dropdown Options">
                     <i data-lucide="settings-2" class="w-4 h-4"></i>
                 </button>
-                
+
                 <button id="themeToggleBtn" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition active-touch" aria-label="Toggle Theme">
                     <i data-lucide="moon" id="themeIcon" class="w-4 h-4"></i>
                 </button>
@@ -98,6 +96,19 @@
 
     <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
 
+        <!-- Top Prominent Action: Quick Photo Add Button -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-3.5 text-white shadow-md flex items-center justify-between gap-3">
+            <div>
+                <h3 class="font-bold text-sm flex items-center gap-1.5">
+                    <i data-lucide="camera" class="w-4 h-4 text-emerald-200"></i> Quick Photo Add
+                </h3>
+                <p class="text-[11px] text-emerald-100 mt-0.5">Snap & watermark reports for unlisted patients instantly</p>
+            </div>
+            <button id="openQuickPhotoAddBtn" class="px-3.5 py-2 bg-white text-emerald-800 hover:bg-emerald-50 font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 shrink-0 active-touch transition">
+                <i data-lucide="plus" class="w-4 h-4 text-emerald-600"></i> Snap Photo
+            </button>
+        </div>
+
         <!-- Add Patient Entry Card -->
         <section class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80 space-y-3">
             <div class="flex items-center justify-between pb-1 border-b border-slate-100 dark:border-slate-700/50">
@@ -105,11 +116,11 @@
                     <i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i>
                     Add Patient Entry
                 </h2>
-                <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">Ultra-Fast Entry</span>
+                <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">Fast Mode</span>
             </div>
 
             <form id="addPatientForm" class="space-y-3">
-                <!-- Patient Name & Expand Button -->
+                <!-- Patient Name & Expand Extra Fields Button -->
                 <div>
                     <div class="flex items-center justify-between mb-1">
                         <label class="block text-xs font-medium text-slate-600 dark:text-slate-400">Patient Name*</label>
@@ -117,20 +128,19 @@
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Bed / CR No.
                         </button>
                     </div>
-                    <input type="text" id="patientName" required placeholder="e.g. Ramesh Kumar" 
+                    <input type="text" id="patientName" required placeholder="e.g. Ramesh Kumar"
                         class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
                 </div>
 
-                <!-- Hidden by default: Collapsible Bed No. & CR No. -->
                 <div id="extraFieldsContainer" class="grid grid-cols-2 gap-2.5 hidden pt-1 border-t border-dashed border-slate-200 dark:border-slate-700">
                     <div>
                         <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bed No. / Ward</label>
-                        <input type="text" id="bedNo" placeholder="e.g. Bed 12 / W3" 
+                        <input type="text" id="bedNo" placeholder="e.g. Bed 12 / W3"
                             class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">CR / Reg No.</label>
-                        <input type="text" id="crNo" placeholder="e.g. 2026-8492" 
+                        <input type="text" id="crNo" placeholder="e.g. 2026-8492"
                             class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
                     </div>
                 </div>
@@ -139,7 +149,6 @@
                 <div>
                     <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
                         <label class="block text-xs font-medium text-slate-600 dark:text-slate-400">Investigations Required*</label>
-                        <!-- Quick Tap Chips -->
                         <div class="flex items-center gap-1">
                             <span class="text-[10px] text-slate-400 font-medium mr-0.5">Quick:</span>
                             <button type="button" id="quickCbcBtn" class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:hover:bg-emerald-900 rounded-lg border border-emerald-300 dark:border-emerald-800 transition active-touch flex items-center gap-0.5">+ CBC</button>
@@ -149,15 +158,12 @@
                     </div>
 
                     <div class="space-y-2">
-                        <div class="flex gap-2">
-                            <select id="testDropdown" class="flex-1 px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white cursor-pointer">
-                                <option value="" disabled selected>-- Select test from dropdown --</option>
-                            </select>
-                        </div>
+                        <select id="testDropdown" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white cursor-pointer">
+                            <option value="" disabled selected>-- Select test from dropdown --</option>
+                        </select>
 
-                        <!-- Custom Test Input -->
                         <div class="flex gap-2">
-                            <input type="text" id="customTestInput" placeholder="Or type test name (e.g. Troponin, CT Head)" 
+                            <input type="text" id="customTestInput" placeholder="Or type test name (e.g. Troponin, CT Head)"
                                 class="flex-1 px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
                             <button type="button" id="addTestChipBtn" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1 active-touch transition">
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
@@ -165,13 +171,11 @@
                         </div>
                     </div>
 
-                    <!-- Selected Tests Chips Container -->
                     <div id="selectedTestsContainer" class="flex flex-wrap gap-1.5 mt-2.5 min-h-[36px] p-2 bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl items-center">
                         <span id="noTestsPlaceholder" class="text-xs text-slate-400 italic">No tests added yet</span>
                     </div>
                 </div>
 
-                <!-- Submit Button -->
                 <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 active-touch transition">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i> Add to Collection List
                 </button>
@@ -179,11 +183,10 @@
         </section>
 
         <section class="space-y-2">
-            <!-- Search & Filter Row -->
             <div class="flex flex-col sm:flex-row gap-2">
                 <div class="relative flex-1">
                     <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
-                    <input type="text" id="searchInput" placeholder="Search name, CR, bed, or test..." 
+                    <input type="text" id="searchInput" placeholder="Search name, CR, bed, or test..."
                         class="w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white">
                 </div>
                 <div class="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
@@ -194,7 +197,6 @@
                 </div>
             </div>
 
-            <!-- Handover & Clean Actions -->
             <div class="flex items-center justify-between gap-2 pt-1">
                 <div class="flex gap-2">
                     <button id="copyHandoverBtn" class="px-3 py-1.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 hover:bg-emerald-200 active-touch transition">
@@ -211,31 +213,64 @@
             </div>
         </section>
 
-        <!-- Task List Area -->
+        <!-- Dynamic Task List -->
         <section id="taskList" class="space-y-3">
-            <!-- Dynamically populated cards will appear here -->
+            <!-- Cards rendered here -->
         </section>
 
-        <!-- Empty State View -->
+        <!-- Empty State -->
         <div id="emptyState" class="hidden py-12 text-center space-y-3 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
             <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400">
                 <i data-lucide="check-circle-2" class="w-6 h-6"></i>
             </div>
             <div>
                 <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No report tasks found</p>
-                <p class="text-xs text-slate-400 max-w-xs mx-auto mt-1">Add a patient entry above or try changing active filters.</p>
+                <p class="text-xs text-slate-400 max-w-xs mx-auto mt-1">Add a patient entry above or click "Quick Photo Add" for unlisted patients.</p>
             </div>
         </div>
 
     </main>
 
-    <!-- Modal 1: Interactive Fullscreen Photo Lightbox Modal -->
+    <!-- Modal 1: Quick Photo Add Overlay -->
+    <div id="quickPhotoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+                <h3 class="font-bold text-sm flex items-center gap-2 text-slate-800 dark:text-white">
+                    <i data-lucide="camera" class="w-4 h-4 text-emerald-500"></i> Quick Photo Add (Unlisted Patient)
+                </h3>
+                <button id="closeQuickPhotoModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-4 space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Patient Name* (For Watermark Stamp)</label>
+                    <input type="text" id="quickPatientName" placeholder="e.g. Sunita Devi"
+                        class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tests / Notes (Optional)</label>
+                    <input type="text" id="quickTestsNote" placeholder="e.g. LFT, KFT"
+                        class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
+                </div>
+
+                <div class="pt-2">
+                    <button id="triggerQuickCameraBtn" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 active-touch transition">
+                        <i data-lucide="camera" class="w-5 h-5"></i> Capture & Watermark Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Interactive Lightbox Modal -->
     <div id="lightboxModal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex flex-col justify-between hidden select-none">
-        <!-- Top Toolbar -->
         <div class="p-4 flex items-center justify-between text-white bg-gradient-to-b from-black/80 to-transparent z-10">
             <div>
-                <h4 id="lightboxTitle" class="font-bold text-sm">Patient Report Photo</h4>
-                <p id="lightboxSubtitle" class="text-[11px] text-slate-300">Zoom in to read register entries clearly</p>
+                <h4 id="lightboxTitle" class="font-bold text-sm">Watermarked Report Photo</h4>
+                <p id="lightboxSubtitle" class="text-[11px] text-slate-300">Pinch or zoom in to inspect high-res register values</p>
             </div>
             <div class="flex items-center gap-2">
                 <button id="rotatePhotoBtn" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-xl transition" title="Rotate 90°">
@@ -250,12 +285,10 @@
             </div>
         </div>
 
-        <!-- High-Res Zoomable Image Container -->
         <div id="zoomViewport" class="flex-1 overflow-hidden relative flex items-center justify-center zoom-container">
-            <img id="lightboxImg" src="" alt="Lab Report Photo" class="max-w-full max-h-full object-contain transition-transform duration-100 origin-center">
+            <img id="lightboxImg" src="" alt="Watermarked Report" class="max-w-full max-h-full object-contain transition-transform duration-100 origin-center">
         </div>
 
-        <!-- Bottom Zoom Control Bar -->
         <div class="p-4 bg-gradient-to-t from-black/90 via-black/70 to-transparent flex items-center justify-between gap-2 z-10">
             <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-2xl text-white">
                 <button id="zoomOutBtn" class="p-1 hover:text-emerald-400 transition"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
@@ -263,19 +296,19 @@
                 <button id="zoomInBtn" class="p-1 hover:text-emerald-400 transition"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
                 <button id="zoomResetBtn" class="ml-1 text-[10px] bg-slate-700 px-2 py-0.5 rounded-lg font-semibold hover:bg-slate-600">Reset</button>
             </div>
-            
+
             <button id="shareSinglePhotoBtn" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                 <i data-lucide="share" class="w-3.5 h-3.5"></i> Share Photo
             </button>
         </div>
     </div>
 
-    <!-- Modal 2: Test Manager Modal -->
+    <!-- Modal 3: Test Dropdown Manager Modal -->
     <div id="testManagerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[85vh]">
             <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
                 <h3 class="font-bold text-sm flex items-center gap-2 text-slate-800 dark:text-white">
-                    <i data-lucide="list-checks" class="w-4 h-4 text-emerald-500"></i> Manage Dropdown Tests
+                    <i data-lucide="list-checks" class="w-4 h-4 text-emerald-500"></i> Manage Dropdown Master List
                 </h3>
                 <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -284,9 +317,9 @@
 
             <div class="p-4 space-y-4 overflow-y-auto flex-1">
                 <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Add Custom Test to Dropdown Master List</label>
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Add Master Test Option</label>
                     <div class="flex gap-2">
-                        <input type="text" id="newMasterTestInput" placeholder="e.g. Procalcitonin" 
+                        <input type="text" id="newMasterTestInput" placeholder="e.g. Procalcitonin"
                             class="flex-1 px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white">
                         <button id="addMasterTestBtn" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 active-touch transition flex items-center gap-1">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
@@ -297,10 +330,8 @@
                 <hr class="border-slate-100 dark:border-slate-700">
 
                 <div class="space-y-1">
-                    <label class="block text-xs font-medium text-slate-500 mb-2">Dropdown Master Tests (<span id="masterTestCount">0</span>)</label>
-                    <div id="masterTestListContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1">
-                        <!-- Populated by JS -->
-                    </div>
+                    <label class="block text-xs font-medium text-slate-500 mb-2">Saved Dropdown Options (<span id="masterTestCount">0</span>)</label>
+                    <div id="masterTestListContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
@@ -311,7 +342,7 @@
         </div>
     </div>
 
-    <!-- Modal 3: Edit Task Modal -->
+    <!-- Modal 4: Edit Task Modal -->
     <div id="editTaskModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
@@ -352,130 +383,227 @@
         </div>
     </div>
 
-    <!-- Notification Toast Container -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2 border border-slate-700">
         <i data-lucide="info" class="w-4 h-4 text-emerald-400"></i>
         <span id="toastMsg">Notification message</span>
     </div>
 
+    <!-- Hidden Native File Inputs for Camera Traps -->
+    <input type="file" id="generalCameraInput" accept="image/*" capture="environment" class="hidden">
+
     <script>
-        // --- INDEXEDDB STORAGE SYSTEM ---
-        const DB_NAME = 'InternReportTrackerDB';
+        const DB_NAME = 'ReportTrackerDB';
         const DB_VERSION = 1;
         let db = null;
 
         function openDatabase() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                try {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains('tasks')) {
-                        db.createObjectStore('tasks', { keyPath: 'id' });
-                    }
-                    if (!db.objectStoreNames.contains('photos')) {
-                        const photoStore = db.createObjectStore('photos', { keyPath: 'id' });
-                        photoStore.createIndex('taskId', 'taskId', { unique: false });
-                    }
-                };
+                    request.onupgradeneeded = (event) => {
+                        const database = event.target.result;
+                        if (!database.objectStoreNames.contains('tasks')) {
+                            database.createObjectStore('tasks', { keyPath: 'id' });
+                        }
+                        if (!database.objectStoreNames.contains('photos')) {
+                            const photoStore = database.createObjectStore('photos', { keyPath: 'id' });
+                            photoStore.createIndex('taskId', 'taskId', { unique: false });
+                        }
+                    };
 
-                request.onsuccess = (event) => {
-                    db = event.target.result;
-                    resolve(db);
-                };
+                    request.onsuccess = (event) => {
+                        db = event.target.result;
+                        resolve(db);
+                    };
 
-                request.onerror = (event) => {
-                    console.error('IndexedDB error:', event.target.error);
-                    reject(event.target.error);
-                };
+                    request.onerror = (event) => {
+                        console.warn('IndexedDB error:', event.target.error);
+                        resolve(null);
+                    };
+                } catch(e) {
+                    console.warn('IndexedDB unavailable:', e);
+                    resolve(null);
+                }
             });
         }
 
-        // IndexedDB CRUD Helper Functions
         async function dbGetAllTasks() {
             return new Promise((resolve) => {
                 if (!db) return resolve([]);
-                const tx = db.transaction('tasks', 'readonly');
-                const store = tx.objectStore('tasks');
-                const req = store.getAll();
-                req.onsuccess = () => resolve(req.result || []);
-                req.onerror = () => resolve([]);
+                try {
+                    const tx = db.transaction('tasks', 'readonly');
+                    const store = tx.objectStore('tasks');
+                    const req = store.getAll();
+                    req.onsuccess = () => resolve(req.result || []);
+                    req.onerror = () => resolve([]);
+                } catch(e) { resolve([]); }
             });
         }
 
         async function dbSaveTask(task) {
             return new Promise((resolve) => {
                 if (!db) return resolve();
-                const tx = db.transaction('tasks', 'readwrite');
-                const store = tx.objectStore('tasks');
-                store.put(task);
-                tx.oncomplete = () => resolve();
+                try {
+                    const tx = db.transaction('tasks', 'readwrite');
+                    const store = tx.objectStore('tasks');
+                    store.put(task);
+                    tx.oncomplete = () => resolve();
+                } catch(e) { resolve(); }
             });
         }
 
         async function dbDeleteTask(taskId) {
             return new Promise(async (resolve) => {
                 if (!db) return resolve();
-                // Delete photos associated with task first
-                const photos = await dbGetPhotosForTask(taskId);
-                for (const p of photos) {
-                    await dbDeletePhoto(p.id);
-                }
-                const tx = db.transaction('tasks', 'readwrite');
-                const store = tx.objectStore('tasks');
-                store.delete(taskId);
-                tx.oncomplete = () => resolve();
+                try {
+                    const photos = await dbGetPhotosForTask(taskId);
+                    for (const p of photos) {
+                        await dbDeletePhoto(p.id);
+                    }
+                    const tx = db.transaction('tasks', 'readwrite');
+                    const store = tx.objectStore('tasks');
+                    store.delete(taskId);
+                    tx.oncomplete = () => resolve();
+                } catch(e) { resolve(); }
             });
         }
 
         async function dbSavePhoto(photoObj) {
             return new Promise((resolve) => {
                 if (!db) return resolve();
-                const tx = db.transaction('photos', 'readwrite');
-                const store = tx.objectStore('photos');
-                store.put(photoObj);
-                tx.oncomplete = () => resolve();
+                try {
+                    const tx = db.transaction('photos', 'readwrite');
+                    const store = tx.objectStore('photos');
+                    store.put(photoObj);
+                    tx.oncomplete = () => resolve();
+                } catch(e) { resolve(); }
             });
         }
 
         async function dbGetPhotosForTask(taskId) {
             return new Promise((resolve) => {
                 if (!db) return resolve([]);
-                const tx = db.transaction('photos', 'readonly');
-                const store = tx.objectStore('photos');
-                const index = store.index('taskId');
-                const req = index.getAll(taskId);
-                req.onsuccess = () => resolve(req.result || []);
-                req.onerror = () => resolve([]);
+                try {
+                    const tx = db.transaction('photos', 'readonly');
+                    const store = tx.objectStore('photos');
+                    const index = store.index('taskId');
+                    const req = index.getAll(taskId);
+                    req.onsuccess = () => resolve(req.result || []);
+                    req.onerror = () => resolve([]);
+                } catch(e) { resolve([]); }
             });
         }
 
         async function dbGetPhotoById(photoId) {
             return new Promise((resolve) => {
                 if (!db) return resolve(null);
-                const tx = db.transaction('photos', 'readonly');
-                const store = tx.objectStore('photos');
-                const req = store.get(photoId);
-                req.onsuccess = () => resolve(req.result || null);
-                req.onerror = () => resolve(null);
+                try {
+                    const tx = db.transaction('photos', 'readonly');
+                    const store = tx.objectStore('photos');
+                    const req = store.get(photoId);
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => resolve(null);
+                } catch(e) { resolve(null); }
             });
         }
 
         async function dbDeletePhoto(photoId) {
             return new Promise((resolve) => {
                 if (!db) return resolve();
-                const tx = db.transaction('photos', 'readwrite');
-                const store = tx.objectStore('photos');
-                store.delete(photoId);
-                tx.oncomplete = () => resolve();
+                try {
+                    const tx = db.transaction('photos', 'readwrite');
+                    const store = tx.objectStore('photos');
+                    store.delete(photoId);
+                    tx.oncomplete = () => resolve();
+                } catch(e) { resolve(); }
             });
         }
 
-        // --- APPLICATION CONSTANTS & STATE ---
+        async function watermarkImage(file, patientName, additionalInfo = '') {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
+
+                img.onload = () => {
+                    // Maximum resolution bound to ensure canvas memory safety while keeping macro detail
+                    const maxDim = 2048;
+                    let width = img.naturalWidth || img.width;
+                    let height = img.naturalHeight || img.height;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+
+                    // 1. Draw raw high-res camera picture
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // 2. Draw dark translucent bottom banner
+                    const bannerHeight = Math.max(70, Math.round(height * 0.08));
+                    const bannerY = height - bannerHeight;
+
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)'; // Deep Slate dark background
+                    ctx.fillRect(0, bannerY, width, bannerHeight);
+
+                    // Accent stripe at top of banner
+                    ctx.fillStyle = '#10b981'; // Emerald accent
+                    ctx.fillRect(0, bannerY, width, Math.max(4, Math.round(bannerHeight * 0.05)));
+
+                    // 3. Draw Watermark Typography
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+                    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    const line1Text = `PATIENT: ${patientName.toUpperCase()} | STATUS: COLLECTED`;
+                    const line2Text = `${dateStr} ${timeStr} ${additionalInfo ? '| ' + additionalInfo : ''} | Intern Report Tracker`;
+
+                    const fontSizeLine1 = Math.max(16, Math.round(bannerHeight * 0.32));
+                    const fontSizeLine2 = Math.max(12, Math.round(bannerHeight * 0.22));
+
+                    ctx.textBaseline = 'middle';
+                    
+                    // Line 1 (Main Patient Banner)
+                    ctx.font = `bold ${fontSizeLine1}px sans-serif`;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(line1Text, Math.round(width * 0.03), bannerY + Math.round(bannerHeight * 0.35));
+
+                    // Line 2 (Timestamp & Subtitle)
+                    ctx.font = `${fontSizeLine2}px sans-serif`;
+                    ctx.fillStyle = '#cbd5e1'; // slate-300
+                    ctx.fillText(line2Text, Math.round(width * 0.03), bannerY + Math.round(bannerHeight * 0.72));
+
+                    // 4. Output watermarked JPEG Blob
+                    canvas.toBlob((blob) => {
+                        if (blob) resolve(blob);
+                        else reject(new Error('Canvas blob generation failed'));
+                    }, 'image/jpeg', 0.92);
+                };
+
+                img.onerror = () => reject(new Error('Image load failed'));
+                reader.readAsDataURL(file);
+            });
+        }
+
         const DEFAULT_TESTS = [
-            "CBC", "BUSE", "LFT", "KFT", "PT/INR", "ABG", 
-            "Urine RM", "Chest X-Ray", "CT Scan", "MRI", 
-            "Ultrasound", "Blood Culture", "Electrolytes", 
+            "CBC", "BUSE", "LFT", "KFT", "PT/INR", "ABG",
+            "Urine RM", "Chest X-Ray", "CT Scan", "MRI",
+            "Ultrasound", "Blood Culture", "Electrolytes",
             "Troponin", "ECG"
         ];
 
@@ -495,6 +623,7 @@
         let currentActivePhotoId = null;
         let zoomScale = 1;
         let rotationAngle = 0;
+        let activeTaskCameraId = null;
 
         // DOM Elements
         const patientNameInput = document.getElementById('patientName');
@@ -521,6 +650,14 @@
         const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
         const clearCompletedBtn = document.getElementById('clearCompletedBtn');
 
+        const openQuickPhotoAddBtn = document.getElementById('openQuickPhotoAddBtn');
+        const quickPhotoModal = document.getElementById('quickPhotoModal');
+        const closeQuickPhotoModalBtn = document.getElementById('closeQuickPhotoModalBtn');
+        const quickPatientName = document.getElementById('quickPatientName');
+        const quickTestsNote = document.getElementById('quickTestsNote');
+        const triggerQuickCameraBtn = document.getElementById('triggerQuickCameraBtn');
+        const generalCameraInput = document.getElementById('generalCameraInput');
+
         const manageTestsBtn = document.getElementById('manageTestsBtn');
         const testManagerModal = document.getElementById('testManagerModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -541,11 +678,9 @@
         const editCrNo = document.getElementById('editCrNo');
         const editTestsString = document.getElementById('editTestsString');
 
-        // Lightbox DOM Elements
         const lightboxModal = document.getElementById('lightboxModal');
         const lightboxImg = document.getElementById('lightboxImg');
         const lightboxTitle = document.getElementById('lightboxTitle');
-        const lightboxSubtitle = document.getElementById('lightboxSubtitle');
         const closeLightboxBtn = document.getElementById('closeLightboxBtn');
         const zoomInBtn = document.getElementById('zoomInBtn');
         const zoomOutBtn = document.getElementById('zoomOutBtn');
@@ -560,14 +695,8 @@
         const toast = document.getElementById('toast');
         const toastMsg = document.getElementById('toastMsg');
 
-        // --- INITIALIZATION ---
         window.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await openDatabase();
-            } catch(e) {
-                console.warn('IndexedDB failed, operating with standard memory');
-            }
-
+            await openDatabase();
             initMasterTests();
             await initTasksAndMigrate();
             initTheme();
@@ -575,22 +704,21 @@
             await renderTaskList();
             lucide.createIcons();
 
-            // Safe PWA Service Worker Registration
-            if ('serviceWorker' in navigator) {
+            // Ultra-safe SW registration to prevent Chrome/GitHub pages crashing
+            if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
                 try {
-                    const swContent = `
+                    const swCode = `
                         self.addEventListener('install', e => self.skipWaiting());
                         self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
                         self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
                     `;
-                    const blob = new Blob([swContent], { type: 'application/javascript' });
-                    const swUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(swUrl).catch(() => {});
-                } catch (e) {}
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const blobUrl = URL.createObjectURL(blob);
+                    navigator.serviceWorker.register(blobUrl).catch(() => {});
+                } catch(e) {}
             }
         });
 
-        // --- MASTER TESTS DROPDOWN ---
         function initMasterTests() {
             const saved = localStorage.getItem('intern_master_tests');
             if (saved) {
@@ -616,11 +744,10 @@
             });
         }
 
-        // --- TASKS INITIALIZATION & LOCALSTORAGE MIGRATION ---
         async function initTasksAndMigrate() {
             tasks = await dbGetAllTasks();
 
-            // Migrate old localStorage data if present
+            // Migration from legacy localStorage format if present
             const oldLocalData = localStorage.getItem('intern_tasks');
             if (oldLocalData) {
                 try {
@@ -636,51 +763,94 @@
             }
         }
 
-        // --- CAMERA CAPTURE & PHOTO HANDLING ---
+        openQuickPhotoAddBtn.addEventListener('click', () => {
+            quickPatientName.value = '';
+            quickTestsNote.value = '';
+            quickPhotoModal.classList.remove('hidden');
+            setTimeout(() => quickPatientName.focus(), 100);
+        });
+
+        closeQuickPhotoModalBtn.addEventListener('click', () => {
+            quickPhotoModal.classList.add('hidden');
+        });
+
+        triggerQuickCameraBtn.addEventListener('click', () => {
+            const name = quickPatientName.value.trim();
+            if (!name) {
+                showToast('Please enter patient name for watermark stamp');
+                return;
+            }
+            activeTaskCameraId = 'QUICK_ADD';
+            generalCameraInput.click();
+        });
+
         window.triggerCameraForTask = function(taskId) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.capture = 'environment'; // Native high-res camera trigger
-            
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                showToast('Saving high-res report photo...');
-                
-                try {
-                    // Convert file to Blob for IndexedDB storage
-                    const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-                    const photoObj = {
-                        id: photoId,
-                        taskId: taskId,
-                        blob: file,
-                        timestamp: new Date().toISOString(),
-                        name: file.name || 'report.jpg'
-                    };
-
-                    await dbSavePhoto(photoObj);
-
-                    // Update task status automatically to Collected if it was Awaited
-                    const task = tasks.find(t => t.id === taskId);
-                    if (task && task.status === STATUS_TYPES.AWAITED) {
-                        task.status = STATUS_TYPES.COLLECTED;
-                        await dbSaveTask(task);
-                    }
-
-                    await renderTaskList();
-                    showToast('📷 High-res report photo saved!');
-                } catch (err) {
-                    console.error(err);
-                    showToast('Error saving image file');
-                }
-            };
-
-            input.click();
+            activeTaskCameraId = taskId;
+            generalCameraInput.click();
         };
 
-        // --- LIGHTBOX INTERACTIVE ZOOM & ROTATE LOGIC ---
+        generalCameraInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            showToast('Watermarking high-res photo...');
+
+            try {
+                let task = null;
+                let patientName = '';
+                let extraNote = '';
+
+                if (activeTaskCameraId === 'QUICK_ADD') {
+                    patientName = quickPatientName.value.trim() || 'Patient';
+                    extraNote = quickTestsNote.value.trim() || 'Report';
+
+                    // Create new task on the fly
+                    task = {
+                        id: Date.now().toString(),
+                        patientName: patientName,
+                        crNo: 'N/A',
+                        bedNo: 'N/A',
+                        tests: extraNote ? extraNote.split(',').map(s => s.trim()) : ['Quick Photo Report'],
+                        status: STATUS_TYPES.COLLECTED,
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    };
+
+                    tasks.unshift(task);
+                    await dbSaveTask(task);
+                    quickPhotoModal.classList.add('hidden');
+                } else {
+                    task = tasks.find(t => t.id === activeTaskCameraId);
+                    if (task) {
+                        patientName = task.patientName;
+                        extraNote = task.tests.join(', ');
+                        task.status = STATUS_TYPES.COLLECTED; // Auto switch status to Collected
+                        await dbSaveTask(task);
+                    }
+                }
+
+                if (!patientName) patientName = 'Patient';
+
+                // Process Watermark Canvas
+                const watermarkedBlob = await watermarkImage(file, patientName, extraNote);
+
+                const photoObj = {
+                    id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    taskId: task ? task.id : 'unassigned',
+                    blob: watermarkedBlob,
+                    timestamp: new Date().toISOString()
+                };
+
+                await dbSavePhoto(photoObj);
+                await renderTaskList();
+                showToast('📷 Watermarked report photo saved!');
+            } catch (err) {
+                console.error(err);
+                showToast('Error watermarking image');
+            }
+
+            generalCameraInput.value = ''; // Reset input
+        });
+
         window.openLightbox = async function(photoId, patientName) {
             const photoObj = await dbGetPhotoById(photoId);
             if (!photoObj) {
@@ -691,9 +861,8 @@
             currentActivePhotoId = photoId;
             const url = URL.createObjectURL(photoObj.blob);
             lightboxImg.src = url;
-            lightboxTitle.textContent = patientName ? `Report: ${patientName}` : 'Patient Report Photo';
-            
-            // Reset transform states
+            lightboxTitle.textContent = patientName ? `Watermarked: ${patientName}` : 'Report Photo';
+
             zoomScale = 1;
             rotationAngle = 0;
             updateImageTransform();
@@ -737,25 +906,11 @@
             await dbDeletePhoto(currentActivePhotoId);
             lightboxModal.classList.add('hidden');
             await renderTaskList();
-            showToast('Photo deleted');
+            showToast('Photo removed');
         });
 
         closeLightboxBtn.addEventListener('click', () => {
             lightboxModal.classList.add('hidden');
-        });
-
-        // Touch Pinch-to-zoom simulation / double tap reset
-        let lastTap = 0;
-        lightboxImg.addEventListener('touchend', (e) => {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            if (tapLength < 300 && tapLength > 0) {
-                // Double tap
-                zoomScale = zoomScale === 1 ? 2.2 : 1;
-                updateImageTransform();
-                e.preventDefault();
-            }
-            lastTap = currentTime;
         });
 
         shareSinglePhotoBtn.addEventListener('click', async () => {
@@ -763,25 +918,23 @@
             const photoObj = await dbGetPhotoById(currentActivePhotoId);
             if (!photoObj) return;
 
-            if (navigator.canShare && navigator.canShare({ files: [new File([photoObj.blob], 'report.jpg', { type: photoObj.blob.type })] })) {
+            if (navigator.canShare && navigator.canShare({ files: [new File([photoObj.blob], 'watermarked_report.jpg', { type: 'image/jpeg' })] })) {
                 try {
-                    const file = new File([photoObj.blob], 'patient_report.jpg', { type: photoObj.blob.type || 'image/jpeg' });
+                    const file = new File([photoObj.blob], 'watermarked_report.jpg', { type: 'image/jpeg' });
                     await navigator.share({
-                        title: 'Patient Lab Report Photo',
+                        title: 'Watermarked Report Photo',
                         files: [file]
                     });
                 } catch(e) {}
             } else {
-                // Fallback download image
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(photoObj.blob);
-                a.download = 'patient_report.jpg';
+                a.download = 'watermarked_report.jpg';
                 a.click();
-                showToast('Photo downloaded to share manually');
+                showToast('Photo downloaded');
             }
         });
 
-        // --- WHATSAPP & WEB SHARE HANDOVER MODULE ---
         async function buildHandoverText() {
             if (tasks.length === 0) return '';
             const today = new Date().toLocaleDateString([], { month: 'short', day: 'numeric' });
@@ -812,7 +965,7 @@
                 text += `🟢 *COLLECTED (${collectedTasks.length}):*\n`;
                 for (const t of collectedTasks) {
                     const photos = await dbGetPhotosForTask(t.id);
-                    const photoTag = photos.length > 0 ? ` [${photos.length} Photo(s) Attached 📷]` : '';
+                    const photoTag = photos.length > 0 ? ` [${photos.length} Watermarked Photo(s) 📷]` : '';
                     text += `• *${t.patientName}* (Bed: ${t.bedNo}): ${t.tests.join(', ')}${photoTag}\n`;
                 }
                 text += `\n`;
@@ -839,14 +992,13 @@
                 return;
             }
 
-            // Gather photos to share if Web Share API supports files
             const files = [];
             for (const t of tasks) {
                 const photos = await dbGetPhotosForTask(t.id);
                 for (let i = 0; i < photos.length; i++) {
                     const p = photos[i];
                     if (p.blob) {
-                        const file = new File([p.blob], `${t.patientName.replace(/\s+/g, '_')}_report_${i+1}.jpg`, { type: p.blob.type || 'image/jpeg' });
+                        const file = new File([p.blob], `${t.patientName.replace(/\s+/g, '_')}_report_${i+1}.jpg`, { type: 'image/jpeg' });
                         files.push(file);
                     }
                 }
@@ -861,7 +1013,6 @@
                     });
                 } catch(e) {}
             } else {
-                // Fallback WhatsApp link / text copy
                 copyToClipboard(text);
                 const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                 window.open(waUrl, '_blank');
@@ -885,7 +1036,6 @@
             document.body.removeChild(el);
         }
 
-        // --- FORM & TASK LIST RENDERING ---
         toggleExtraFieldsBtn.addEventListener('click', () => {
             const isHidden = extraFieldsContainer.classList.contains('hidden');
             if (isHidden) {
@@ -969,7 +1119,7 @@
             const bed = bedNoInput.value.trim();
 
             if (selectedFormTests.length === 0) {
-                showToast('Please add at least one test to collection list.');
+                showToast('Please add at least one test.');
                 return;
             }
 
@@ -986,7 +1136,6 @@
             tasks.unshift(newTask);
             await dbSaveTask(newTask);
 
-            // Form Reset
             addPatientForm.reset();
             selectedFormTests = [];
             extraFieldsContainer.classList.add('hidden');
@@ -1021,10 +1170,10 @@
             for (const task of filteredTasks) {
                 const card = document.createElement('div');
                 const photos = await dbGetPhotosForTask(task.id);
-                
+
                 let statusBgClass = '';
                 let statusBadgeClass = '';
-                
+
                 if (task.status === STATUS_TYPES.AWAITED) {
                     statusBgClass = 'border-l-4 border-l-amber-500 bg-white dark:bg-slate-800';
                     statusBadgeClass = 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800';
@@ -1038,14 +1187,13 @@
 
                 card.className = `${statusBgClass} rounded-2xl p-3.5 shadow-sm border border-slate-200/80 dark:border-slate-700/80 space-y-3 transition`;
 
-                // Build thumbnails HTML safely
                 let photosThumbnailsHTML = '';
                 if (photos.length > 0) {
                     const thumbElements = photos.map(p => {
                         const imgUrl = URL.createObjectURL(p.blob);
                         return `
-                            <div class="relative group w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 shrink-0">
-                                <img src="${imgUrl}" alt="Lab Report Photo" onclick="openLightbox('${p.id}', '${escapeHtml(task.patientName)}')" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition">
+                            <div class="relative group w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 shrink-0">
+                                <img src="${imgUrl}" alt="Watermarked Report" onclick="openLightbox('${p.id}', '${escapeHtml(task.patientName)}')" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition">
                             </div>
                         `;
                     }).join('');
@@ -1053,7 +1201,7 @@
                     photosThumbnailsHTML = `
                         <div class="pt-1">
                             <label class="block text-[11px] font-semibold text-slate-500 mb-1 flex items-center gap-1">
-                                <i data-lucide="image" class="w-3 h-3 text-emerald-500"></i> Attached Report Photos (${photos.length}):
+                                <i data-lucide="image" class="w-3 h-3 text-emerald-500"></i> Watermarked Photos (${photos.length}):
                             </label>
                             <div class="flex items-center gap-2 overflow-x-auto pb-1">
                                 ${thumbElements}
@@ -1077,9 +1225,9 @@
                                 <span><strong class="font-medium">CR:</strong> ${escapeHtml(task.crNo)}</span>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-center gap-1">
-                            <button onclick="triggerCameraForTask('${task.id}')" class="p-1.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 rounded-xl text-xs font-semibold flex items-center gap-1 active-touch transition" title="Snap Report Photo">
+                            <button onclick="triggerCameraForTask('${task.id}')" class="p-1.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 rounded-xl text-xs font-semibold flex items-center gap-1 active-touch transition" title="Snap & Watermark Photo">
                                 <i data-lucide="camera" class="w-3.5 h-3.5"></i> Camera
                             </button>
                             <button onclick="openEditModal('${task.id}')" class="p-1 text-slate-400 hover:text-emerald-600 transition" title="Edit Entry">
@@ -1091,7 +1239,6 @@
                         </div>
                     </div>
 
-                    <!-- Tests Badges -->
                     <div class="flex flex-wrap gap-1.5">
                         ${task.tests.map(test => `
                             <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-md border border-slate-200/60 dark:border-slate-600/60">
@@ -1100,35 +1247,33 @@
                         `).join('')}
                     </div>
 
-                    <!-- Thumbnails Area -->
                     ${photosThumbnailsHTML}
 
-                    <!-- Instant Status Toggle Row -->
                     <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-1">
                         <span class="text-[11px] font-semibold text-slate-400">Status:</span>
                         <div class="flex items-center gap-1">
-                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.AWAITED}')" 
+                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.AWAITED}')"
                                 class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.AWAITED 
-                                    ? 'bg-amber-500 text-white shadow-sm font-semibold' 
+                                    task.status === STATUS_TYPES.AWAITED
+                                    ? 'bg-amber-500 text-white shadow-sm font-semibold'
                                     : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/40'
                                 }">
                                 <i data-lucide="clock" class="w-3 h-3"></i> Awaited
                             </button>
 
-                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.COLLECTED}')" 
+                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.COLLECTED}')"
                                 class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.COLLECTED 
-                                    ? 'bg-emerald-600 text-white shadow-sm font-semibold' 
+                                    task.status === STATUS_TYPES.COLLECTED
+                                    ? 'bg-emerald-600 text-white shadow-sm font-semibold'
                                     : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/40'
                                 }">
                                 <i data-lucide="check-circle" class="w-3 h-3"></i> Collected
                             </button>
 
-                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.NO_ENTRY}')" 
+                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.NO_ENTRY}')"
                                 class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.NO_ENTRY 
-                                    ? 'bg-rose-600 text-white shadow-sm font-semibold' 
+                                    task.status === STATUS_TYPES.NO_ENTRY
+                                    ? 'bg-rose-600 text-white shadow-sm font-semibold'
                                     : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-rose-100 dark:hover:bg-rose-950/40'
                                 }">
                                 <i data-lucide="alert-circle" class="w-3 h-3"></i> No Entry
@@ -1160,7 +1305,6 @@
             showToast('Task removed');
         };
 
-        // --- EDIT TASK MODAL ---
         window.openEditModal = function(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (!task) return;
@@ -1209,7 +1353,6 @@
             showToast('Collected tasks cleared');
         });
 
-        // --- MASTER TEST MANAGER MODAL ---
         function renderMasterTestListInModal() {
             masterTestListContainer.innerHTML = '';
             masterTestCount.textContent = masterTests.length;
@@ -1232,7 +1375,7 @@
             masterTests.splice(index, 1);
             saveMasterTests();
             renderMasterTestListInModal();
-            showToast('Test removed from master dropdown');
+            showToast('Test removed from dropdown list');
         };
 
         addMasterTestBtn.addEventListener('click', () => {
@@ -1243,7 +1386,7 @@
                     saveMasterTests();
                     renderMasterTestListInModal();
                     newMasterTestInput.value = '';
-                    showToast(`Added "${val}" to dropdown`);
+                    showToast(`Added "${val}" to master list`);
                 } else {
                     showToast('Test already exists');
                 }
@@ -1265,7 +1408,6 @@
         closeModalBtn.addEventListener('click', () => testManagerModal.classList.add('hidden'));
         doneModalBtn.addEventListener('click', () => testManagerModal.classList.add('hidden'));
 
-        // --- FILTERS & SEARCH ---
         filterBtns.forEach(btn => {
             btn.addEventListener('click', async () => {
                 filterBtns.forEach(b => {
@@ -1286,7 +1428,6 @@
             await renderTaskList();
         });
 
-        // --- UTILS & THEME ---
         function showToast(msg) {
             toastMsg.textContent = msg;
             toast.classList.remove('opacity-0', 'pointer-events-none');
