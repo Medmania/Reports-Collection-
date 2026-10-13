@@ -1,1467 +1,980 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Intern Lab Report Tracker</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Intern Lab Report Tracker</title>
+  
+  <!-- PWA Meta Tags & Icons -->
+  <meta name="theme-color" content="#059669">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ReportTracker">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23059669'/><path d='M30 25 h40 v50 h-40 z' fill='none' stroke='white' stroke-width='6'/><path d='M38 40 h24 M38 52 h24 M38 64 h14' stroke='white' stroke-width='6' stroke-linecap='round'/></svg>">
 
-    <!-- PWA & Mobile Meta Tags -->
-    <meta name="theme-color" content="#10b981">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Report Tracker">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063176.png">
+  <!-- Inline Data URI Manifest for PWA installation -->
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Intern%20Lab%20Report%20Tracker%22%2C%22short_name%22%3A%22ReportTracker%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%23059669%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'20'%20fill%3D'%23059669'%2F%3E%3Cpath%20d%3D'M30%2025%20h40%20v50%20h-40%20z'%20fill%3D'none'%20stroke%3D'white'%20stroke-width%3D'6'%2F%3E%3Cpath%20d%3D'M38%2040%20h24%20M38%2052%20h24%20M38%2064%20h14'%20stroke%3D'white'%20stroke-width%3D'6'%20stroke-linecap%3D'round'%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 
-    <!-- Base64 Inline Web App Manifest for Chrome Android & Safari Home Screen Install -->
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiSW50ZXJuIExhYiBSZXBvcnQgVHJhY2tlciIsInNob3J0X25hbWUiOiJSZXBvcnQgVHJhY2tlciIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSI6ImJhY2tncm91bmRfY29sb3IiOiIjMGYxNzJhIiwidGhlbWVfY29sb3IiOiIjMTBiOTgxIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzMwNjMvMzA2MzE3Ni5wbmciLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ==">
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #059669;
+      --primary-hover: #047857;
+      --primary-light: #ecfdf5;
+      --border-color: #e2e8f0;
+      
+      --status-awaited-bg: #fef3c7;
+      --status-awaited-text: #92400e;
+      --status-collected-bg: #d1fae5;
+      --status-collected-text: #065f46;
+      --status-noentry-bg: #fee2e2;
+      --status-noentry-text: #991b1b;
+    }
 
-    <!-- CDN Dependencies: Tailwind CSS & Lucide Icons -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --primary-light: #064e3b;
+      
+      --status-awaited-bg: #78350f;
+      --status-awaited-text: #fef3c7;
+      --status-collected-bg: #064e3b;
+      --status-collected-text: #a7f3d0;
+      --status-noentry-bg: #7f1d1d;
+      --status-noentry-text: #fecaca;
+    }
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .active-touch:active {
-            transform: scale(0.97);
-        }
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-            border-radius: 4px;
-        }
-        .zoom-container {
-            touch-action: none;
-            cursor: grab;
-        }
-        .zoom-container:active {
-            cursor: grabbing;
-        }
-    </style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 110px;
+    }
+
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 34px; height: 34px; background: var(--primary); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .brand-title h1 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+    .brand-title p { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
+
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; color: var(--text-main); }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 12px; }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .form-title { font-weight: 700; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+
+    .input-group { margin-bottom: 10px; }
+    .input-label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus { border-color: var(--primary); }
+
+    .quick-chips { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+    .chip {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chip:active { transform: scale(0.96); }
+
+    .badge-tag {
+      background: var(--border-color);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+    .badge-tag button { background: none; border: none; color: var(--text-muted); margin-left: 2px; cursor: pointer; font-size: 0.85rem; }
+
+    .btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn:active { background: var(--primary-hover); }
+
+    .collapsible-trigger {
+      font-size: 0.8rem;
+      color: var(--primary);
+      background: none;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 2px 0;
+    }
+
+    .collapsed-fields { display: none; margin-top: 8px; }
+    .collapsed-fields.show { display: block; }
+
+    .search-filter-box { margin-bottom: 12px; }
+    .filter-tabs { display: flex; gap: 6px; margin-top: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .filter-tab {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .filter-tab.active { background: var(--text-main); color: var(--bg-card); border-color: var(--text-main); }
+
+    .handover-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+    .btn-secondary {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    /* Task List Card */
+    .task-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .task-card.status-collected { border-left: 4px solid #059669; }
+    .task-card.status-awaited { border-left: 4px solid #d97706; }
+    .task-card.status-noentry { border-left: 4px solid #dc2626; }
+
+    .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .patient-name { font-weight: 700; font-size: 1rem; color: var(--text-main); }
+    .patient-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
+
+    .task-tests { margin: 8px 0; display: flex; flex-wrap: wrap; gap: 4px; }
+    .test-pill { font-size: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); padding: 2px 7px; border-radius: 4px; }
+
+    .status-group { display: flex; gap: 4px; margin-top: 10px; }
+    .status-btn {
+      flex: 1;
+      padding: 6px 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-align: center;
+      opacity: 0.5;
+    }
+    .status-btn.selected { opacity: 1; }
+    .btn-awaited { background: var(--status-awaited-bg); color: var(--status-awaited-text); }
+    .btn-collected { background: var(--status-collected-bg); color: var(--status-collected-text); }
+    .btn-noentry { background: var(--status-noentry-bg); color: var(--status-noentry-text); }
+
+    .card-actions { display: flex; gap: 6px; align-items: center; }
+
+    /* Photo Grid in Card */
+    .photo-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .photo-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    /* Floating Snap Action Button (FAB) */
+    .fab-snap {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 50;
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .fab-snap:active { transform: scale(0.95); }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--bg-card);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .modal-title { font-weight: 700; font-size: 1rem; }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 120;
+      display: none;
+      flex-direction: column;
+      padding: 12px;
+    }
+    .lightbox-modal.active { display: flex; }
+    .lightbox-img-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform 0.2s ease;
+    }
+    .lightbox-controls {
+      display: flex;
+      justify-content: space-around;
+      padding: 12px;
+      color: white;
+    }
+
+    /* Hidden Camera Input */
+    #hidden-cam-input, #quick-cam-input { display: none; }
+  </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 pb-16 select-none">
+<body>
 
-    <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-4 py-2.5 shadow-sm">
-        <div class="max-w-xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="p-2 bg-emerald-500 text-white rounded-xl shadow-sm">
-                    <i data-lucide="clipboard-check" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-base leading-tight flex items-center gap-1.5">
-                        Report Tracker
-                        <span id="pwaStatusBadge" class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-semibold">PWA Ready</span>
-                    </h1>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                        <span id="networkIndicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span id="networkText">Offline Watermark Engine</span>
-                    </p>
-                </div>
-            </div>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">📋</div>
+      <div class="brand-title">
+        <h1>Report Tracker</h1>
+        <p id="app-status">Offline Local Storage</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="theme-toggle" title="Toggle Theme">🌙</button>
+      <button class="icon-btn" id="manage-tests-btn" title="Manage Custom Tests">⚙️</button>
+    </div>
+  </header>
 
-            <div class="flex items-center gap-1.5">
-                <button id="manageTestsBtn" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs flex items-center gap-1 font-medium transition active-touch" title="Manage Dropdown Options">
-                    <i data-lucide="settings-2" class="w-4 h-4"></i>
-                </button>
+  <div class="container">
+    
+    <!-- Add Patient Entry Form -->
+    <div class="card">
+      <div class="form-header">
+        <span class="form-title">👤 Add Patient Entry</span>
+        <button type="button" class="collapsible-trigger" id="toggle-extra-fields">+ Add Bed / CR No.</button>
+      </div>
 
-                <button id="themeToggleBtn" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition active-touch" aria-label="Toggle Theme">
-                    <i data-lucide="moon" id="themeIcon" class="w-4 h-4"></i>
-                </button>
-            </div>
+      <div class="input-group">
+        <input type="text" id="patient-name" placeholder="Patient Name (e.g. Ramesh Kumar)">
+      </div>
+
+      <div class="collapsed-fields" id="extra-fields">
+        <div class="input-group">
+          <input type="text" id="patient-bed" placeholder="Bed No. / Ward (e.g. Bed 12)">
         </div>
-    </header>
+        <div class="input-group">
+          <input type="text" id="patient-cr" placeholder="CR / Reg No. (e.g. 2026-8492)">
+        </div>
+      </div>
 
-    <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
-
-        <!-- Add Patient Entry Card -->
-        <section class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80 space-y-3">
-            <div class="flex items-center justify-between pb-1 border-b border-slate-100 dark:border-slate-700/50">
-                <h2 class="text-sm font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-200">
-                    <i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i>
-                    Add Patient Entry
-                </h2>
-                <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">Fast Mode</span>
-            </div>
-
-            <form id="addPatientForm" class="space-y-3">
-                <!-- Patient Name & Expand Extra Fields Button -->
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400">Patient Name*</label>
-                        <button type="button" id="toggleExtraFieldsBtn" class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1 hover:underline active-touch">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Bed / CR No.
-                        </button>
-                    </div>
-                    <input type="text" id="patientName" required placeholder="e.g. Ramesh Kumar"
-                        class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
-                </div>
-
-                <div id="extraFieldsContainer" class="grid grid-cols-2 gap-2.5 hidden pt-1 border-t border-dashed border-slate-200 dark:border-slate-700">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bed No. / Ward</label>
-                        <input type="text" id="bedNo" placeholder="e.g. Bed 12 / W3"
-                            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">CR / Reg No.</label>
-                        <input type="text" id="crNo" placeholder="e.g. 2026-8492"
-                            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
-                    </div>
-                </div>
-
-                <!-- Test Selection with Quick Action Chips -->
-                <div>
-                    <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400">Investigations Required*</label>
-                        <div class="flex items-center gap-1">
-                            <span class="text-[10px] text-slate-400 font-medium mr-0.5">Quick:</span>
-                            <button type="button" id="quickCbcBtn" class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:hover:bg-emerald-900 rounded-lg border border-emerald-300 dark:border-emerald-800 transition active-touch flex items-center gap-0.5">+ CBC</button>
-                            <button type="button" id="quickBuseBtn" class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:hover:bg-emerald-900 rounded-lg border border-emerald-300 dark:border-emerald-800 transition active-touch flex items-center gap-0.5">+ BUSE</button>
-                            <button type="button" id="quickPtinrBtn" class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:hover:bg-emerald-900 rounded-lg border border-emerald-300 dark:border-emerald-800 transition active-touch flex items-center gap-0.5">+ PT/INR</button>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <select id="testDropdown" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white cursor-pointer">
-                            <option value="" disabled selected>-- Select test from dropdown --</option>
-                        </select>
-
-                        <div class="flex gap-2">
-                            <input type="text" id="customTestInput" placeholder="Or type test name (e.g. Troponin, CT Head)"
-                                class="flex-1 px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
-                            <button type="button" id="addTestChipBtn" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1 active-touch transition">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="selectedTestsContainer" class="flex flex-wrap gap-1.5 mt-2.5 min-h-[36px] p-2 bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl items-center">
-                        <span id="noTestsPlaceholder" class="text-xs text-slate-400 italic">No tests added yet</span>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 active-touch transition">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Add to Collection List
-                </button>
-            </form>
-        </section>
-
-        <section class="space-y-2">
-            <div class="flex flex-col sm:flex-row gap-2">
-                <div class="relative flex-1">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
-                    <input type="text" id="searchInput" placeholder="Search name, CR, bed, or test..."
-                        class="w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white">
-                </div>
-                <div class="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                    <button data-filter="all" class="filter-btn active-filter px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm transition">All</button>
-                    <button data-filter="Awaited" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">Awaited</button>
-                    <button data-filter="Collected" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">Collected</button>
-                    <button data-filter="No Entry" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">No Entry</button>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between gap-2 pt-1">
-                <div class="flex gap-2">
-                    <button id="copyHandoverBtn" class="px-3 py-1.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 hover:bg-emerald-200 active-touch transition">
-                        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Text Handover
-                    </button>
-                    <button id="shareWhatsAppBtn" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 hover:bg-emerald-700 active-touch transition shadow-xs">
-                        <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share with Photos
-                    </button>
-                </div>
-
-                <button id="clearCompletedBtn" class="text-xs text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 flex items-center gap-1 transition px-2 py-1">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear Collected
-                </button>
-            </div>
-        </section>
-
-        <!-- Dynamic Task List -->
-        <section id="taskList" class="space-y-3">
-            <!-- Cards rendered here -->
-        </section>
-
-        <!-- Empty State -->
-        <div id="emptyState" class="hidden py-12 text-center space-y-3 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-            <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400">
-                <i data-lucide="check-circle-2" class="w-6 h-6"></i>
-            </div>
-            <div>
-                <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No report tasks found</p>
-                <p class="text-xs text-slate-400 max-w-xs mx-auto mt-1">Add a patient entry above or tap floating "Snap Photo" for unlisted patients.</p>
-            </div>
+      <div class="input-group" style="margin-top: 8px;">
+        <span class="input-label">Investigations Required</span>
+        <div class="quick-chips">
+          <div class="chip" onclick="quickAddTest('CBC')">+ CBC</div>
+          <div class="chip" onclick="quickAddTest('BUSE')">+ BUSE</div>
+          <div class="chip" onclick="quickAddTest('PT/INR')">+ PT/INR</div>
         </div>
 
-    </main>
-
-    <!-- Floating Action Button (FAB) for Instant Photo Snap -->
-    <button id="openQuickPhotoAddBtn" class="fixed bottom-6 right-5 z-40 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white px-4 py-3.5 rounded-full shadow-xl shadow-emerald-600/40 flex items-center gap-2 text-xs font-bold transition-all duration-200 border border-emerald-400/30 active-touch ring-2 ring-white/20">
-        <i data-lucide="camera" class="w-5 h-5 text-emerald-100"></i>
-        <span class="pr-0.5">Snap Photo</span>
-    </button>
-
-    <!-- Modal 1: Quick Photo Add Overlay -->
-    <div id="quickPhotoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-                <h3 class="font-bold text-sm flex items-center gap-2 text-slate-800 dark:text-white">
-                    <i data-lucide="camera" class="w-4 h-4 text-emerald-500"></i> Quick Photo Add (Unlisted Patient)
-                </h3>
-                <button id="closeQuickPhotoModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div class="p-4 space-y-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Patient Name* (For Watermark Stamp)</label>
-                    <input type="text" id="quickPatientName" placeholder="e.g. Sunita Devi"
-                        class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tests / Notes (Optional)</label>
-                    <input type="text" id="quickTestsNote" placeholder="e.g. LFT, KFT"
-                        class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white">
-                </div>
-
-                <div class="pt-2">
-                    <button id="triggerQuickCameraBtn" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 active-touch transition">
-                        <i data-lucide="camera" class="w-5 h-5"></i> Capture & Watermark Report
-                    </button>
-                </div>
-            </div>
+        <select id="test-dropdown" onchange="handleDropdownSelect(this)">
+          <option value="">-- Select test from dropdown --</option>
+        </select>
+        
+        <div style="display: flex; gap: 6px; margin-top: 6px;">
+          <input type="text" id="custom-test-input" placeholder="Or type test name...">
+          <button type="button" class="btn" style="width: auto; padding: 0 14px;" onclick="addCustomTestFromInput()">Add</button>
         </div>
+      </div>
+
+      <div id="selected-tests-container" style="margin-bottom: 10px;"></div>
+
+      <button type="button" class="btn" onclick="addPatientEntry()">➕ Add to Collection List</button>
     </div>
 
-    <!-- Modal 2: Interactive Lightbox Modal -->
-    <div id="lightboxModal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex flex-col justify-between hidden select-none">
-        <div class="p-4 flex items-center justify-between text-white bg-gradient-to-b from-black/80 to-transparent z-10">
-            <div>
-                <h4 id="lightboxTitle" class="font-bold text-sm">Watermarked Report Photo</h4>
-                <p id="lightboxSubtitle" class="text-[11px] text-slate-300">Pinch or zoom in to inspect high-res register values</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="rotatePhotoBtn" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-xl transition" title="Rotate 90°">
-                    <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-                </button>
-                <button id="deletePhotoBtn" class="p-2 bg-rose-600/80 hover:bg-rose-600 text-white rounded-xl transition" title="Delete Photo">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-                <button id="closeLightboxBtn" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-xl transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </div>
-
-        <div id="zoomViewport" class="flex-1 overflow-hidden relative flex items-center justify-center zoom-container">
-            <img id="lightboxImg" src="" alt="Watermarked Report" class="max-w-full max-h-full object-contain transition-transform duration-100 origin-center">
-        </div>
-
-        <div class="p-4 bg-gradient-to-t from-black/90 via-black/70 to-transparent flex items-center justify-between gap-2 z-10">
-            <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-2xl text-white">
-                <button id="zoomOutBtn" class="p-1 hover:text-emerald-400 transition"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
-                <span id="zoomLevelText" class="text-xs font-mono font-bold w-12 text-center">100%</span>
-                <button id="zoomInBtn" class="p-1 hover:text-emerald-400 transition"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
-                <button id="zoomResetBtn" class="ml-1 text-[10px] bg-slate-700 px-2 py-0.5 rounded-lg font-semibold hover:bg-slate-600">Reset</button>
-            </div>
-
-            <button id="shareSinglePhotoBtn" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
-                <i data-lucide="share" class="w-3.5 h-3.5"></i> Share Photo
-            </button>
-        </div>
+    <!-- Search & Filter Controls -->
+    <div class="search-filter-box">
+      <input type="text" id="search-input" placeholder="Search name, bed, or test..." oninput="renderTaskList()">
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-tab" onclick="setFilter('Awaited', this)">Awaited</button>
+        <button class="filter-tab" onclick="setFilter('Collected', this)">Collected</button>
+        <button class="filter-tab" onclick="setFilter('No Entry', this)">No Entry</button>
+      </div>
     </div>
 
-    <!-- Modal 3: Test Dropdown Manager Modal -->
-    <div id="testManagerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-                <h3 class="font-bold text-sm flex items-center gap-2 text-slate-800 dark:text-white">
-                    <i data-lucide="list-checks" class="w-4 h-4 text-emerald-500"></i> Manage Dropdown Master List
-                </h3>
-                <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
+    <!-- Handover WhatsApp Actions -->
+    <div class="handover-actions">
+      <button class="btn-secondary" onclick="copyWhatsAppText()">📋 Copy Text Handover</button>
+      <button class="btn-secondary" style="color: #dc2626;" onclick="clearCollectedTasks()">🗑️ Clear Collected</button>
+    </div>
 
-            <div class="p-4 space-y-4 overflow-y-auto flex-1">
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Add Master Test Option</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newMasterTestInput" placeholder="e.g. Procalcitonin"
-                            class="flex-1 px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white">
-                        <button id="addMasterTestBtn" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 active-touch transition flex items-center gap-1">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
-                        </button>
-                    </div>
-                </div>
+    <!-- Active Task List -->
+    <div id="task-list"></div>
 
-                <hr class="border-slate-100 dark:border-slate-700">
+  </div>
 
-                <div class="space-y-1">
-                    <label class="block text-xs font-medium text-slate-500 mb-2">Saved Dropdown Options (<span id="masterTestCount">0</span>)</label>
-                    <div id="masterTestListContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1"></div>
-                </div>
-            </div>
+  <!-- Floating Snap Photo Button (FAB) -->
+  <button class="fab-snap" onclick="triggerQuickCamera()">
+    📷 Snap Photo
+  </button>
 
-            <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                <button id="resetDefaultTestsBtn" class="text-xs text-rose-500 hover:text-rose-600 font-medium underline py-1">Reset Defaults</button>
-                <button id="doneModalBtn" class="px-4 py-1.5 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-xs font-medium hover:opacity-90">Done</button>
-            </div>
+  <!-- Hidden Camera File Inputs -->
+  <input type="file" id="hidden-cam-input" accept="image/*" capture="environment" onchange="handleImageCaptured(event)">
+  <input type="file" id="quick-cam-input" accept="image/*" capture="environment" onchange="handleQuickImageCaptured(event)">
+
+  <!-- Manage Custom Tests Modal -->
+  <div class="modal-overlay" id="tests-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">⚙️ Manage Master Test List</span>
+        <button class="icon-btn" onclick="closeModal('tests-modal')">✕</button>
+      </div>
+      <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <input type="text" id="new-master-test" placeholder="New test name...">
+        <button class="btn" style="width: auto; padding: 0 14px;" onclick="addMasterTest()">Save</button>
+      </div>
+      <div id="master-tests-list"></div>
+    </div>
+  </div>
+
+  <!-- Quick Unlisted Photo Modal -->
+  <div class="modal-overlay" id="quick-photo-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">📸 Quick Unlisted Snap</span>
+        <button class="icon-btn" onclick="closeModal('quick-photo-modal')">✕</button>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Enter patient name to watermark and attach the report immediately.</p>
+      <div class="input-group">
+        <input type="text" id="quick-patient-name" placeholder="Patient Name (Required)">
+      </div>
+      <div class="input-group">
+        <input type="text" id="quick-patient-test" placeholder="Investigation (Optional, e.g. CBC)">
+      </div>
+      <button class="btn" onclick="openQuickCamera()">📷 Take Watermarked Photo</button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Lightbox Modal -->
+  <div class="lightbox-modal" id="lightbox-modal">
+    <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+      <span id="lightbox-title" style="font-size: 0.9rem; font-weight: 600;"></span>
+      <button class="icon-btn" style="color: white;" onclick="closeLightbox()">✕</button>
+    </div>
+    <div class="lightbox-img-container">
+      <img id="lightbox-img" class="lightbox-img" src="" alt="Report Photo">
+    </div>
+    <div class="lightbox-controls">
+      <button class="btn-secondary" style="color: white; border-color: #555; background: rgba(255,255,255,0.1);" onclick="rotatePhoto()">🔄 Rotate</button>
+      <button class="btn-secondary" style="color: #fca5a5; border-color: #7f1d1d; background: rgba(127,29,29,0.3);" onclick="deletePhoto()">🗑️ Delete</button>
+    </div>
+  </div>
+
+  <script>
+    // App State & Master Lists
+    let defaultTests = ["CBC", "BUSE", "PT/INR", "LFT", "KFT", "Serum Electrolytes", "ABG", "Urine Routine", "Blood Culture", "Chest X-Ray", "CT Head", "ECG", "Troponin I", "Cross-match"];
+    let customTests = JSON.parse(localStorage.getItem("master_tests")) || defaultTests;
+    let selectedFormTests = [];
+    let tasks = JSON.parse(localStorage.getItem("patient_tasks")) || [];
+    let currentFilter = "all";
+    let activeCameraTaskId = null;
+    let activeLightboxPhoto = null; // { taskId, photoId, rotation }
+    let db = null;
+
+    // Initialize IndexedDB for storing high-res watermarked images
+    function initDB() {
+      const request = indexedDB.open("LabReportImagesDB", 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains("photos")) {
+          db.createObjectStore("photos", { keyPath: "id" });
+        }
+      };
+      request.onsuccess = (e) => { db = e.target.result; renderTaskList(); };
+      request.onerror = () => console.error("IndexedDB error");
+    }
+
+    // App Startup Initialization
+    window.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      initDB();
+      populateTestDropdown();
+      renderMasterTestList();
+
+      // Setup extra fields toggle
+      document.getElementById("toggle-extra-fields").addEventListener("click", () => {
+        const extra = document.getElementById("extra-fields");
+        extra.classList.toggle("show");
+      });
+
+      // Dark Mode Toggle
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        const nextTheme = currentTheme === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        localStorage.setItem("app_theme", nextTheme);
+        document.getElementById("theme-toggle").textContent = nextTheme === "dark" ? "☀️" : "🌙";
+      });
+
+      document.getElementById("manage-tests-btn").addEventListener("click", () => {
+        document.getElementById("tests-modal").classList.add("active");
+      });
+    });
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem("app_theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      document.getElementById("theme-toggle").textContent = savedTheme === "dark" ? "☀️" : "🌙";
+    }
+
+    // Master Tests Functions
+    function populateTestDropdown() {
+      const select = document.getElementById("test-dropdown");
+      select.innerHTML = '<option value="">-- Select test from dropdown --</option>';
+      customTests.forEach(test => {
+        const opt = document.createElement("option");
+        opt.value = test;
+        opt.textContent = test;
+        select.appendChild(opt);
+      });
+    }
+
+    function quickAddTest(testName) {
+      if (!selectedFormTests.includes(testName)) {
+        selectedFormTests.push(testName);
+        renderSelectedFormTests();
+      }
+    }
+
+    function handleDropdownSelect(select) {
+      const val = select.value;
+      if (val && !selectedFormTests.includes(val)) {
+        selectedFormTests.push(val);
+        renderSelectedFormTests();
+      }
+      select.value = "";
+    }
+
+    function addCustomTestFromInput() {
+      const input = document.getElementById("custom-test-input");
+      const val = input.value.trim();
+      if (val && !selectedFormTests.includes(val)) {
+        selectedFormTests.push(val);
+        renderSelectedFormTests();
+        if (!customTests.includes(val)) {
+          customTests.push(val);
+          localStorage.setItem("master_tests", JSON.stringify(customTests));
+          populateTestDropdown();
+          renderMasterTestList();
+        }
+      }
+      input.value = "";
+    }
+
+    function removeFormTest(testName) {
+      selectedFormTests = selectedFormTests.filter(t => t !== testName);
+      renderSelectedFormTests();
+    }
+
+    function renderSelectedFormTests() {
+      const container = document.getElementById("selected-tests-container");
+      container.innerHTML = selectedFormTests.map(t => `
+        <span class="badge-tag">${t} <button onclick="removeFormTest('${t}')">✕</button></span>
+      `).join("");
+    }
+
+    function renderMasterTestList() {
+      const container = document.getElementById("master-tests-list");
+      container.innerHTML = customTests.map((t, idx) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 6px 0; border-bottom: 1px solid var(--border-color);">
+          <span style="font-size: 0.85rem;">${t}</span>
+          <button class="icon-btn" style="color:#dc2626;" onclick="deleteMasterTest(${idx})">🗑️</button>
         </div>
-    </div>
+      `).join("");
+    }
 
-    <!-- Modal 4: Edit Task Modal -->
-    <div id="editTaskModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-                <h3 class="font-bold text-sm flex items-center gap-2 text-slate-800 dark:text-white">
-                    <i data-lucide="pencil" class="w-4 h-4 text-emerald-500"></i> Edit Patient Task
-                </h3>
-                <button id="closeEditModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+    function addMasterTest() {
+      const val = document.getElementById("new-master-test").value.trim();
+      if (val && !customTests.includes(val)) {
+        customTests.push(val);
+        localStorage.setItem("master_tests", JSON.stringify(customTests));
+        populateTestDropdown();
+        renderMasterTestList();
+        document.getElementById("new-master-test").value = "";
+      }
+    }
+
+    function deleteMasterTest(idx) {
+      customTests.splice(idx, 1);
+      localStorage.setItem("master_tests", JSON.stringify(customTests));
+      populateTestDropdown();
+      renderMasterTestList();
+    }
+
+    // Task & Patient Management
+    function saveTasks() {
+      localStorage.setItem("patient_tasks", JSON.stringify(tasks));
+      renderTaskList();
+    }
+
+    function addPatientEntry() {
+      const nameInput = document.getElementById("patient-name");
+      const bedInput = document.getElementById("patient-bed");
+      const crInput = document.getElementById("patient-cr");
+
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert("Please enter patient name");
+        return;
+      }
+
+      const newTask = {
+        id: "task_" + Date.now(),
+        name: name,
+        bed: bedInput.value.trim(),
+        cr: crInput.value.trim(),
+        tests: [...selectedFormTests],
+        status: "Awaited",
+        createdAt: new Date().toISOString(),
+        photoIds: []
+      };
+
+      tasks.unshift(newTask);
+      saveTasks();
+
+      // Reset form
+      nameInput.value = "";
+      bedInput.value = "";
+      crInput.value = "";
+      selectedFormTests = [];
+      renderSelectedFormTests();
+      document.getElementById("extra-fields").classList.remove("show");
+    }
+
+    function updateTaskStatus(taskId, status) {
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        task.status = status;
+        saveTasks();
+      }
+    }
+
+    function deleteTask(taskId) {
+      if (confirm("Delete this patient record?")) {
+        tasks = tasks.filter(t => t.id !== taskId);
+        saveTasks();
+      }
+    }
+
+    function setFilter(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+      el.classList.add("active");
+      renderTaskList();
+    }
+
+    // Render Task List
+    function renderTaskList() {
+      const container = document.getElementById("task-list");
+      const searchQuery = document.getElementById("search-input").value.toLowerCase().trim();
+
+      let filtered = tasks.filter(t => {
+        const matchesFilter = currentFilter === "all" || t.status === currentFilter;
+        const matchesSearch = t.name.toLowerCase().includes(searchQuery) ||
+                              (t.bed && t.bed.toLowerCase().includes(searchQuery)) ||
+                              (t.cr && t.cr.toLowerCase().includes(searchQuery)) ||
+                              t.tests.some(test => test.toLowerCase().includes(searchQuery));
+        return matchesFilter && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 30px 10px; color: var(--text-muted); font-size: 0.85rem;">No report entries found.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => {
+        const bedCrParts = [];
+        if (t.bed) bedCrParts.push(`Bed: ${t.bed}`);
+        if (t.cr) bedCrParts.push(`CR: ${t.cr}`);
+        const subText = bedCrParts.length > 0 ? bedCrParts.join(" • ") : "";
+
+        return `
+          <div class="task-card status-${t.status.toLowerCase().replace(' ', '')}">
+            <div class="task-header">
+              <div>
+                <div class="patient-name">${t.name}</div>
+                ${subText ? `<div class="patient-sub">${subText}</div>` : ''}
+              </div>
+              <div class="card-actions">
+                <button class="icon-btn" title="Take Report Photo" onclick="triggerTaskCamera('${t.id}')">📷</button>
+                <button class="icon-btn" style="color:#dc2626;" title="Delete" onclick="deleteTask('${t.id}')">🗑️</button>
+              </div>
             </div>
 
-            <form id="editTaskForm" class="p-4 space-y-3">
-                <input type="hidden" id="editTaskId">
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Patient Name</label>
-                    <input type="text" id="editPatientName" required class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Bed No.</label>
-                        <input type="text" id="editBedNo" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">CR No.</label>
-                        <input type="text" id="editCrNo" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Tests (Comma Separated)</label>
-                    <input type="text" id="editTestsString" required class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white">
-                </div>
+            <div class="task-tests">
+              ${t.tests.map(test => `<span class="test-pill">${test}</span>`).join("")}
+            </div>
 
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" id="cancelEditBtn" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-medium">Cancel</button>
-                    <button type="submit" class="px-4 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-medium hover:bg-emerald-700">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
+            <div id="photos-container-${t.id}" class="photo-grid"></div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2 border border-slate-700">
-        <i data-lucide="info" class="w-4 h-4 text-emerald-400"></i>
-        <span id="toastMsg">Notification message</span>
-    </div>
+            <div class="status-group">
+              <button class="status-btn btn-awaited ${t.status === 'Awaited' ? 'selected' : ''}" onclick="updateTaskStatus('${t.id}', 'Awaited')">Awaited</button>
+              <button class="status-btn btn-collected ${t.status === 'Collected' ? 'selected' : ''}" onclick="updateTaskStatus('${t.id}', 'Collected')">Collected</button>
+              <button class="status-btn btn-noentry ${t.status === 'No Entry' ? 'selected' : ''}" onclick="updateTaskStatus('${t.id}', 'No Entry')">No Entry</button>
+            </div>
+          </div>
+        `;
+      }).join("");
 
-    <!-- Hidden Native File Inputs for Camera Traps -->
-    <input type="file" id="generalCameraInput" accept="image/*" capture="environment" class="hidden">
-
-    <script>
-        const DB_NAME = 'ReportTrackerDB';
-        const DB_VERSION = 1;
-        let db = null;
-
-        function openDatabase() {
-            return new Promise((resolve, reject) => {
-                try {
-                    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-                    request.onupgradeneeded = (event) => {
-                        const database = event.target.result;
-                        if (!database.objectStoreNames.contains('tasks')) {
-                            database.createObjectStore('tasks', { keyPath: 'id' });
-                        }
-                        if (!database.objectStoreNames.contains('photos')) {
-                            const photoStore = database.createObjectStore('photos', { keyPath: 'id' });
-                            photoStore.createIndex('taskId', 'taskId', { unique: false });
-                        }
-                    };
-
-                    request.onsuccess = (event) => {
-                        db = event.target.result;
-                        resolve(db);
-                    };
-
-                    request.onerror = (event) => {
-                        console.warn('IndexedDB error:', event.target.error);
-                        resolve(null);
-                    };
-                } catch(e) {
-                    console.warn('IndexedDB unavailable:', e);
-                    resolve(null);
-                }
-            });
+      // Load attached photo thumbnails asynchronously from IndexedDB
+      filtered.forEach(t => {
+        if (t.photoIds && t.photoIds.length > 0) {
+          loadTaskPhotos(t.id, t.photoIds);
         }
-
-        async function dbGetAllTasks() {
-            return new Promise((resolve) => {
-                if (!db) return resolve([]);
-                try {
-                    const tx = db.transaction('tasks', 'readonly');
-                    const store = tx.objectStore('tasks');
-                    const req = store.getAll();
-                    req.onsuccess = () => resolve(req.result || []);
-                    req.onerror = () => resolve([]);
-                } catch(e) { resolve([]); }
-            });
-        }
-
-        async function dbSaveTask(task) {
-            return new Promise((resolve) => {
-                if (!db) return resolve();
-                try {
-                    const tx = db.transaction('tasks', 'readwrite');
-                    const store = tx.objectStore('tasks');
-                    store.put(task);
-                    tx.oncomplete = () => resolve();
-                } catch(e) { resolve(); }
-            });
-        }
-
-        async function dbDeleteTask(taskId) {
-            return new Promise(async (resolve) => {
-                if (!db) return resolve();
-                try {
-                    const photos = await dbGetPhotosForTask(taskId);
-                    for (const p of photos) {
-                        await dbDeletePhoto(p.id);
-                    }
-                    const tx = db.transaction('tasks', 'readwrite');
-                    const store = tx.objectStore('tasks');
-                    store.delete(taskId);
-                    tx.oncomplete = () => resolve();
-                } catch(e) { resolve(); }
-            });
-        }
-
-        async function dbSavePhoto(photoObj) {
-            return new Promise((resolve) => {
-                if (!db) return resolve();
-                try {
-                    const tx = db.transaction('photos', 'readwrite');
-                    const store = tx.objectStore('photos');
-                    store.put(photoObj);
-                    tx.oncomplete = () => resolve();
-                } catch(e) { resolve(); }
-            });
-        }
-
-        async function dbGetPhotosForTask(taskId) {
-            return new Promise((resolve) => {
-                if (!db) return resolve([]);
-                try {
-                    const tx = db.transaction('photos', 'readonly');
-                    const store = tx.objectStore('photos');
-                    const index = store.index('taskId');
-                    const req = index.getAll(taskId);
-                    req.onsuccess = () => resolve(req.result || []);
-                    req.onerror = () => resolve([]);
-                } catch(e) { resolve([]); }
-            });
-        }
-
-        async function dbGetPhotoById(photoId) {
-            return new Promise((resolve) => {
-                if (!db) return resolve(null);
-                try {
-                    const tx = db.transaction('photos', 'readonly');
-                    const store = tx.objectStore('photos');
-                    const req = store.get(photoId);
-                    req.onsuccess = () => resolve(req.result || null);
-                    req.onerror = () => resolve(null);
-                } catch(e) { resolve(null); }
-            });
-        }
-
-        async function dbDeletePhoto(photoId) {
-            return new Promise((resolve) => {
-                if (!db) return resolve();
-                try {
-                    const tx = db.transaction('photos', 'readwrite');
-                    const store = tx.objectStore('photos');
-                    store.delete(photoId);
-                    tx.oncomplete = () => resolve();
-                } catch(e) { resolve(); }
-            });
-        }
-
-        async function watermarkImage(file, patientName, additionalInfo = '') {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                const reader = new FileReader();
-
-                reader.onload = (e) => {
-                    img.src = e.target.result;
-                };
-
-                img.onload = () => {
-                    // Maximum resolution bound to ensure canvas memory safety while keeping macro detail
-                    const maxDim = 2048;
-                    let width = img.naturalWidth || img.width;
-                    let height = img.naturalHeight || img.height;
-
-                    if (width > maxDim || height > maxDim) {
-                        if (width > height) {
-                            height = Math.round((height * maxDim) / width);
-                            width = maxDim;
-                        } else {
-                            width = Math.round((width * maxDim) / height);
-                            height = maxDim;
-                        }
-                    }
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-
-                    // 1. Draw raw high-res camera picture
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // 2. Draw dark translucent bottom banner
-                    const bannerHeight = Math.max(70, Math.round(height * 0.08));
-                    const bannerY = height - bannerHeight;
-
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)'; // Deep Slate dark background
-                    ctx.fillRect(0, bannerY, width, bannerHeight);
-
-                    // Accent stripe at top of banner
-                    ctx.fillStyle = '#10b981'; // Emerald accent
-                    ctx.fillRect(0, bannerY, width, Math.max(4, Math.round(bannerHeight * 0.05)));
-
-                    // 3. Draw Watermark Typography
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-                    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    const line1Text = `PATIENT: ${patientName.toUpperCase()} | STATUS: COLLECTED`;
-                    const line2Text = `${dateStr} ${timeStr} ${additionalInfo ? '| ' + additionalInfo : ''} | Intern Report Tracker`;
-
-                    const fontSizeLine1 = Math.max(16, Math.round(bannerHeight * 0.32));
-                    const fontSizeLine2 = Math.max(12, Math.round(bannerHeight * 0.22));
-
-                    ctx.textBaseline = 'middle';
-                    
-                    // Line 1 (Main Patient Banner)
-                    ctx.font = `bold ${fontSizeLine1}px sans-serif`;
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText(line1Text, Math.round(width * 0.03), bannerY + Math.round(bannerHeight * 0.35));
-
-                    // Line 2 (Timestamp & Subtitle)
-                    ctx.font = `${fontSizeLine2}px sans-serif`;
-                    ctx.fillStyle = '#cbd5e1'; // slate-300
-                    ctx.fillText(line2Text, Math.round(width * 0.03), bannerY + Math.round(bannerHeight * 0.72));
-
-                    // 4. Output watermarked JPEG Blob
-                    canvas.toBlob((blob) => {
-                        if (blob) resolve(blob);
-                        else reject(new Error('Canvas blob generation failed'));
-                    }, 'image/jpeg', 0.92);
-                };
-
-                img.onerror = () => reject(new Error('Image load failed'));
-                reader.readAsDataURL(file);
-            });
-        }
-
-        const DEFAULT_TESTS = [
-            "CBC", "BUSE", "LFT", "KFT", "PT/INR", "ABG",
-            "Urine RM", "Chest X-Ray", "CT Scan", "MRI",
-            "Ultrasound", "Blood Culture", "Electrolytes",
-            "Troponin", "ECG"
-        ];
-
-        const STATUS_TYPES = {
-            AWAITED: 'Awaited',
-            COLLECTED: 'Collected',
-            NO_ENTRY: 'No Entry'
-        };
-
-        let masterTests = [];
-        let tasks = [];
-        let selectedFormTests = [];
-        let currentFilter = 'all';
-        let searchQuery = '';
-
-        // Lightbox state
-        let currentActivePhotoId = null;
-        let zoomScale = 1;
-        let rotationAngle = 0;
-        let activeTaskCameraId = null;
-
-        // DOM Elements
-        const patientNameInput = document.getElementById('patientName');
-        const bedNoInput = document.getElementById('bedNo');
-        const crNoInput = document.getElementById('crNo');
-        const toggleExtraFieldsBtn = document.getElementById('toggleExtraFieldsBtn');
-        const extraFieldsContainer = document.getElementById('extraFieldsContainer');
-        const testDropdown = document.getElementById('testDropdown');
-        const customTestInput = document.getElementById('customTestInput');
-        const addTestChipBtn = document.getElementById('addTestChipBtn');
-        const selectedTestsContainer = document.getElementById('selectedTestsContainer');
-        const noTestsPlaceholder = document.getElementById('noTestsPlaceholder');
-        const addPatientForm = document.getElementById('addPatientForm');
-        const taskListContainer = document.getElementById('taskList');
-        const emptyState = document.getElementById('emptyState');
-
-        const quickCbcBtn = document.getElementById('quickCbcBtn');
-        const quickBuseBtn = document.getElementById('quickBuseBtn');
-        const quickPtinrBtn = document.getElementById('quickPtinrBtn');
-
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const searchInput = document.getElementById('searchInput');
-        const copyHandoverBtn = document.getElementById('copyHandoverBtn');
-        const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
-        const clearCompletedBtn = document.getElementById('clearCompletedBtn');
-
-        const openQuickPhotoAddBtn = document.getElementById('openQuickPhotoAddBtn');
-        const quickPhotoModal = document.getElementById('quickPhotoModal');
-        const closeQuickPhotoModalBtn = document.getElementById('closeQuickPhotoModalBtn');
-        const quickPatientName = document.getElementById('quickPatientName');
-        const quickTestsNote = document.getElementById('quickTestsNote');
-        const triggerQuickCameraBtn = document.getElementById('triggerQuickCameraBtn');
-        const generalCameraInput = document.getElementById('generalCameraInput');
-
-        const manageTestsBtn = document.getElementById('manageTestsBtn');
-        const testManagerModal = document.getElementById('testManagerModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const doneModalBtn = document.getElementById('doneModalBtn');
-        const newMasterTestInput = document.getElementById('newMasterTestInput');
-        const addMasterTestBtn = document.getElementById('addMasterTestBtn');
-        const masterTestListContainer = document.getElementById('masterTestListContainer');
-        const masterTestCount = document.getElementById('masterTestCount');
-        const resetDefaultTestsBtn = document.getElementById('resetDefaultTestsBtn');
-
-        const editTaskModal = document.getElementById('editTaskModal');
-        const closeEditModalBtn = document.getElementById('closeEditModalBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const editTaskForm = document.getElementById('editTaskForm');
-        const editTaskId = document.getElementById('editTaskId');
-        const editPatientName = document.getElementById('editPatientName');
-        const editBedNo = document.getElementById('editBedNo');
-        const editCrNo = document.getElementById('editCrNo');
-        const editTestsString = document.getElementById('editTestsString');
-
-        const lightboxModal = document.getElementById('lightboxModal');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const lightboxTitle = document.getElementById('lightboxTitle');
-        const closeLightboxBtn = document.getElementById('closeLightboxBtn');
-        const zoomInBtn = document.getElementById('zoomInBtn');
-        const zoomOutBtn = document.getElementById('zoomOutBtn');
-        const zoomResetBtn = document.getElementById('zoomResetBtn');
-        const zoomLevelText = document.getElementById('zoomLevelText');
-        const rotatePhotoBtn = document.getElementById('rotatePhotoBtn');
-        const deletePhotoBtn = document.getElementById('deletePhotoBtn');
-        const shareSinglePhotoBtn = document.getElementById('shareSinglePhotoBtn');
-
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeIcon = document.getElementById('themeIcon');
-        const toast = document.getElementById('toast');
-        const toastMsg = document.getElementById('toastMsg');
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            await openDatabase();
-            initMasterTests();
-            await initTasksAndMigrate();
-            initTheme();
-            renderFormChips();
-            await renderTaskList();
-            lucide.createIcons();
-
-            // Ultra-safe SW registration to prevent Chrome/GitHub pages crashing
-            if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
-                try {
-                    const swCode = `
-                        self.addEventListener('install', e => self.skipWaiting());
-                        self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                        self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-                    `;
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const blobUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(blobUrl).catch(() => {});
-                } catch(e) {}
-            }
-        });
-
-        function initMasterTests() {
-            const saved = localStorage.getItem('intern_master_tests');
-            if (saved) {
-                try { masterTests = JSON.parse(saved); } catch(e) { masterTests = [...DEFAULT_TESTS]; }
-            } else {
-                masterTests = [...DEFAULT_TESTS];
-            }
-            populateDropdown();
-        }
-
-        function saveMasterTests() {
-            localStorage.setItem('intern_master_tests', JSON.stringify(masterTests));
-            populateDropdown();
-        }
-
-        function populateDropdown() {
-            testDropdown.innerHTML = '<option value="" disabled selected>-- Select test from dropdown --</option>';
-            masterTests.forEach(test => {
-                const opt = document.createElement('option');
-                opt.value = test;
-                opt.textContent = test;
-                testDropdown.appendChild(opt);
-            });
-        }
-
-        async function initTasksAndMigrate() {
-            tasks = await dbGetAllTasks();
-
-            // Migration from legacy localStorage format if present
-            const oldLocalData = localStorage.getItem('intern_tasks');
-            if (oldLocalData) {
-                try {
-                    const oldTasks = JSON.parse(oldLocalData);
-                    for (const oldT of oldTasks) {
-                        if (!tasks.some(t => t.id === oldT.id)) {
-                            tasks.push(oldT);
-                            await dbSaveTask(oldT);
-                        }
-                    }
-                    localStorage.removeItem('intern_tasks');
-                } catch(e) {}
-            }
-        }
-
-        openQuickPhotoAddBtn.addEventListener('click', () => {
-            quickPatientName.value = '';
-            quickTestsNote.value = '';
-            quickPhotoModal.classList.remove('hidden');
-            setTimeout(() => quickPatientName.focus(), 100);
-        });
-
-        closeQuickPhotoModalBtn.addEventListener('click', () => {
-            quickPhotoModal.classList.add('hidden');
-        });
-
-        triggerQuickCameraBtn.addEventListener('click', () => {
-            const name = quickPatientName.value.trim();
-            if (!name) {
-                showToast('Please enter patient name for watermark stamp');
-                return;
-            }
-            activeTaskCameraId = 'QUICK_ADD';
-            generalCameraInput.click();
-        });
-
-        window.triggerCameraForTask = function(taskId) {
-            activeTaskCameraId = taskId;
-            generalCameraInput.click();
-        };
-
-        generalCameraInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            showToast('Watermarking high-res photo...');
-
-            try {
-                let task = null;
-                let patientName = '';
-                let extraNote = '';
-
-                if (activeTaskCameraId === 'QUICK_ADD') {
-                    patientName = quickPatientName.value.trim() || 'Patient';
-                    extraNote = quickTestsNote.value.trim() || 'Report';
-
-                    // Create new task on the fly
-                    task = {
-                        id: Date.now().toString(),
-                        patientName: patientName,
-                        crNo: 'N/A',
-                        bedNo: 'N/A',
-                        tests: extraNote ? extraNote.split(',').map(s => s.trim()) : ['Quick Photo Report'],
-                        status: STATUS_TYPES.COLLECTED,
-                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    };
-
-                    tasks.unshift(task);
-                    await dbSaveTask(task);
-                    quickPhotoModal.classList.add('hidden');
-                } else {
-                    task = tasks.find(t => t.id === activeTaskCameraId);
-                    if (task) {
-                        patientName = task.patientName;
-                        extraNote = task.tests.join(', ');
-                        task.status = STATUS_TYPES.COLLECTED; // Auto switch status to Collected
-                        await dbSaveTask(task);
-                    }
-                }
-
-                if (!patientName) patientName = 'Patient';
-
-                // Process Watermark Canvas
-                const watermarkedBlob = await watermarkImage(file, patientName, extraNote);
-
-                const photoObj = {
-                    id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-                    taskId: task ? task.id : 'unassigned',
-                    blob: watermarkedBlob,
-                    timestamp: new Date().toISOString()
-                };
-
-                await dbSavePhoto(photoObj);
-                await renderTaskList();
-                showToast('📷 Watermarked report photo saved!');
-            } catch (err) {
-                console.error(err);
-                showToast('Error watermarking image');
-            }
-
-            generalCameraInput.value = ''; // Reset input
-        });
-
-        window.openLightbox = async function(photoId, patientName) {
-            const photoObj = await dbGetPhotoById(photoId);
-            if (!photoObj) {
-                showToast('Photo not found');
-                return;
-            }
-
-            currentActivePhotoId = photoId;
-            const url = URL.createObjectURL(photoObj.blob);
-            lightboxImg.src = url;
-            lightboxTitle.textContent = patientName ? `Watermarked: ${patientName}` : 'Report Photo';
-
-            zoomScale = 1;
-            rotationAngle = 0;
-            updateImageTransform();
-
-            lightboxModal.classList.remove('hidden');
-            lucide.createIcons();
-        };
-
-        function updateImageTransform() {
-            lightboxImg.style.transform = `scale(${zoomScale}) rotate(${rotationAngle}deg)`;
-            zoomLevelText.textContent = `${Math.round(zoomScale * 100)}%`;
-        }
-
-        zoomInBtn.addEventListener('click', () => {
-            if (zoomScale < 4) {
-                zoomScale += 0.3;
-                updateImageTransform();
-            }
-        });
-
-        zoomOutBtn.addEventListener('click', () => {
-            if (zoomScale > 0.5) {
-                zoomScale -= 0.3;
-                updateImageTransform();
-            }
-        });
-
-        zoomResetBtn.addEventListener('click', () => {
-            zoomScale = 1;
-            rotationAngle = 0;
-            updateImageTransform();
-        });
-
-        rotatePhotoBtn.addEventListener('click', () => {
-            rotationAngle = (rotationAngle + 90) % 360;
-            updateImageTransform();
-        });
-
-        deletePhotoBtn.addEventListener('click', async () => {
-            if (!currentActivePhotoId) return;
-            await dbDeletePhoto(currentActivePhotoId);
-            lightboxModal.classList.add('hidden');
-            await renderTaskList();
-            showToast('Photo removed');
-        });
-
-        closeLightboxBtn.addEventListener('click', () => {
-            lightboxModal.classList.add('hidden');
-        });
-
-        shareSinglePhotoBtn.addEventListener('click', async () => {
-            if (!currentActivePhotoId) return;
-            const photoObj = await dbGetPhotoById(currentActivePhotoId);
-            if (!photoObj) return;
-
-            if (navigator.canShare && navigator.canShare({ files: [new File([photoObj.blob], 'watermarked_report.jpg', { type: 'image/jpeg' })] })) {
-                try {
-                    const file = new File([photoObj.blob], 'watermarked_report.jpg', { type: 'image/jpeg' });
-                    await navigator.share({
-                        title: 'Watermarked Report Photo',
-                        files: [file]
-                    });
-                } catch(e) {}
-            } else {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(photoObj.blob);
-                a.download = 'watermarked_report.jpg';
-                a.click();
-                showToast('Photo downloaded');
-            }
-        });
-
-        async function buildHandoverText() {
-            if (tasks.length === 0) return '';
-            const today = new Date().toLocaleDateString([], { month: 'short', day: 'numeric' });
-            let text = `📋 *LAB / RADIOLOGY REPORT HANDOVER* (${today})\n`;
-            text += `------------------------------------\n\n`;
-
-            const awaitedTasks = tasks.filter(t => t.status === STATUS_TYPES.AWAITED);
-            const noEntryTasks = tasks.filter(t => t.status === STATUS_TYPES.NO_ENTRY);
-            const collectedTasks = tasks.filter(t => t.status === STATUS_TYPES.COLLECTED);
-
-            if (awaitedTasks.length > 0) {
-                text += `🟡 *REPORTS AWAITED (${awaitedTasks.length}):*\n`;
-                awaitedTasks.forEach(t => {
-                    text += `• *${t.patientName}* (Bed: ${t.bedNo} | CR: ${t.crNo}): ${t.tests.join(', ')}\n`;
-                });
-                text += `\n`;
-            }
-
-            if (noEntryTasks.length > 0) {
-                text += `🔴 *NO ENTRY / REJECTED (${noEntryTasks.length}):*\n`;
-                noEntryTasks.forEach(t => {
-                    text += `• *${t.patientName}* (Bed: ${t.bedNo}): ${t.tests.join(', ')}\n`;
-                });
-                text += `\n`;
-            }
-
-            if (collectedTasks.length > 0) {
-                text += `🟢 *COLLECTED (${collectedTasks.length}):*\n`;
-                for (const t of collectedTasks) {
-                    const photos = await dbGetPhotosForTask(t.id);
-                    const photoTag = photos.length > 0 ? ` [${photos.length} Watermarked Photo(s) 📷]` : '';
-                    text += `• *${t.patientName}* (Bed: ${t.bedNo}): ${t.tests.join(', ')}${photoTag}\n`;
-                }
-                text += `\n`;
-            }
-
-            text += `------------------------------------\n`;
-            text += `_Sent via Intern Lab Report Tracker_`;
-            return text;
-        }
-
-        copyHandoverBtn.addEventListener('click', async () => {
-            const text = await buildHandoverText();
-            if (!text) {
-                showToast('No tasks to copy');
-                return;
-            }
-            copyToClipboard(text);
-        });
-
-        shareWhatsAppBtn.addEventListener('click', async () => {
-            const text = await buildHandoverText();
-            if (!text) {
-                showToast('No tasks to share');
-                return;
-            }
-
-            const files = [];
-            for (const t of tasks) {
-                const photos = await dbGetPhotosForTask(t.id);
-                for (let i = 0; i < photos.length; i++) {
-                    const p = photos[i];
-                    if (p.blob) {
-                        const file = new File([p.blob], `${t.patientName.replace(/\s+/g, '_')}_report_${i+1}.jpg`, { type: 'image/jpeg' });
-                        files.push(file);
-                    }
-                }
-            }
-
-            if (navigator.canShare && files.length > 0 && navigator.canShare({ files: files })) {
-                try {
-                    await navigator.share({
-                        title: 'Lab Report Handover',
-                        text: text,
-                        files: files
-                    });
-                } catch(e) {}
-            } else {
-                copyToClipboard(text);
-                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                window.open(waUrl, '_blank');
-            }
-        });
-
-        function copyToClipboard(str) {
-            const el = document.createElement('textarea');
-            el.value = str;
-            el.setAttribute('readonly', '');
-            el.style.position = 'absolute';
-            el.style.left = '-9999px';
-            document.body.appendChild(el);
-            el.select();
-            try {
-                document.execCommand('copy');
-                showToast('Handover copied! Ready to paste in WhatsApp');
-            } catch (err) {
-                showToast('Failed to copy');
-            }
-            document.body.removeChild(el);
-        }
-
-        toggleExtraFieldsBtn.addEventListener('click', () => {
-            const isHidden = extraFieldsContainer.classList.contains('hidden');
-            if (isHidden) {
-                extraFieldsContainer.classList.remove('hidden');
-                toggleExtraFieldsBtn.innerHTML = `<i data-lucide="minus" class="w-3.5 h-3.5"></i> Hide Bed / CR No.`;
-            } else {
-                extraFieldsContainer.classList.add('hidden');
-                toggleExtraFieldsBtn.innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Bed / CR No.`;
-            }
-            lucide.createIcons();
-        });
-
-        function addTestToForm(testName) {
-            if (!testName) return;
-            if (!selectedFormTests.includes(testName)) {
-                selectedFormTests.push(testName);
-                renderFormChips();
-            } else {
-                showToast(`"${testName}" already added`);
-            }
-        }
-
-        quickCbcBtn.addEventListener('click', () => addTestToForm('CBC'));
-        quickBuseBtn.addEventListener('click', () => addTestToForm('BUSE'));
-        quickPtinrBtn.addEventListener('click', () => addTestToForm('PT/INR'));
-
-        testDropdown.addEventListener('change', (e) => {
-            const val = e.target.value;
-            if (val) {
-                addTestToForm(val);
-                testDropdown.selectedIndex = 0;
-            }
-        });
-
-        addTestChipBtn.addEventListener('click', () => {
-            const val = customTestInput.value.trim();
-            if (val) {
-                addTestToForm(val);
-                customTestInput.value = '';
-            }
-        });
-
-        customTestInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addTestChipBtn.click();
-            }
-        });
-
-        function renderFormChips() {
-            selectedTestsContainer.innerHTML = '';
-            if (selectedFormTests.length === 0) {
-                selectedTestsContainer.appendChild(noTestsPlaceholder);
-                return;
-            }
-
-            selectedFormTests.forEach((test, index) => {
-                const chip = document.createElement('span');
-                chip.className = "inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 rounded-lg text-xs font-semibold shadow-xs";
-                chip.innerHTML = `
-                    <span>${escapeHtml(test)}</span>
-                    <button type="button" onclick="removeFormChip(${index})" class="hover:text-rose-600 transition">
-                        <i data-lucide="x" class="w-3 h-3"></i>
-                    </button>
-                `;
-                selectedTestsContainer.appendChild(chip);
-            });
-            lucide.createIcons();
-        }
-
-        window.removeFormChip = function(index) {
-            selectedFormTests.splice(index, 1);
-            renderFormChips();
-        };
-
-        addPatientForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const name = patientNameInput.value.trim();
-            const cr = crNoInput.value.trim();
-            const bed = bedNoInput.value.trim();
-
-            if (selectedFormTests.length === 0) {
-                showToast('Please add at least one test.');
-                return;
-            }
-
-            const newTask = {
-                id: Date.now().toString(),
-                patientName: name,
-                crNo: cr || 'N/A',
-                bedNo: bed || 'N/A',
-                tests: [...selectedFormTests],
-                status: STATUS_TYPES.AWAITED,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+    }
+
+    // Camera & Watermarking Engine
+    function triggerTaskCamera(taskId) {
+      activeCameraTaskId = taskId;
+      document.getElementById("hidden-cam-input").click();
+    }
+
+    function triggerQuickCamera() {
+      document.getElementById("quick-photo-modal").classList.add("active");
+    }
+
+    function openQuickCamera() {
+      const name = document.getElementById("quick-patient-name").value.trim();
+      if (!name) {
+        alert("Please enter patient name for watermark");
+        return;
+      }
+      closeModal("quick-photo-modal");
+      document.getElementById("quick-cam-input").click();
+    }
+
+    function handleImageCaptured(e) {
+      const file = e.target.files[0];
+      if (!file || !activeCameraTaskId) return;
+      const task = tasks.find(t => t.id === activeCameraTaskId);
+      if (task) {
+        processAndSaveImage(file, task);
+      }
+      e.target.value = "";
+    }
+
+    function handleQuickImageCaptured(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const name = document.getElementById("quick-patient-name").value.trim() || "Unlisted Patient";
+      const test = document.getElementById("quick-patient-test").value.trim();
+
+      const newTask = {
+        id: "task_" + Date.now(),
+        name: name,
+        bed: "",
+        cr: "",
+        tests: test ? [test] : ["Report"],
+        status: "Collected",
+        createdAt: new Date().toISOString(),
+        photoIds: []
+      };
+
+      tasks.unshift(newTask);
+      localStorage.setItem("patient_tasks", JSON.stringify(tasks));
+      processAndSaveImage(file, newTask);
+
+      document.getElementById("quick-patient-name").value = "";
+      document.getElementById("quick-patient-test").value = "";
+      e.target.value = "";
+    }
+
+    function processAndSaveImage(file, task) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          // Canvas Watermark Stamping
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          // Dark Watermark Footer Bar
+          const barHeight = Math.max(40, Math.floor(canvas.height * 0.06));
+          ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+          ctx.fillRect(0, canvas.height - barHeight, canvas.width, barHeight);
+
+          // Watermark Text Formatting
+          const now = new Date();
+          const dateStr = now.toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' });
+          const timeStr = now.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' });
+          const watermarkText = `PATIENT: ${task.name.toUpperCase()} | STATUS: COLLECTED | ${dateStr} ${timeStr}`;
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = `bold ${Math.floor(barHeight * 0.45)}px sans-serif`;
+          ctx.textBaseline = "middle";
+          ctx.fillText(watermarkText, 16, canvas.height - (barHeight / 2));
+
+          const watermarkedDataUrl = canvas.toDataURL("image/jpeg", 0.88);
+          const photoId = "photo_" + Date.now();
+
+          // Save to IndexedDB
+          if (db) {
+            const tx = db.transaction("photos", "readwrite");
+            tx.objectStore("photos").put({ id: photoId, data: watermarkedDataUrl });
+            tx.oncomplete = () => {
+              task.photoIds.push(photoId);
+              task.status = "Collected"; // Auto set status to Collected on image capture
+              saveTasks();
             };
-
-            tasks.unshift(newTask);
-            await dbSaveTask(newTask);
-
-            addPatientForm.reset();
-            selectedFormTests = [];
-            extraFieldsContainer.classList.add('hidden');
-            toggleExtraFieldsBtn.innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Bed / CR No.`;
-
-            renderFormChips();
-            await renderTaskList();
-
-            showToast('Patient added to collection list!');
-        });
-
-        async function renderTaskList() {
-            taskListContainer.innerHTML = '';
-
-            const filteredTasks = tasks.filter(task => {
-                const matchesFilter = (currentFilter === 'all') || (task.status === currentFilter);
-                const query = searchQuery.toLowerCase();
-                const matchesSearch = task.patientName.toLowerCase().includes(query) ||
-                                      task.crNo.toLowerCase().includes(query) ||
-                                      task.bedNo.toLowerCase().includes(query) ||
-                                      task.tests.some(t => t.toLowerCase().includes(query));
-                return matchesFilter && matchesSearch;
-            });
-
-            if (filteredTasks.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            for (const task of filteredTasks) {
-                const card = document.createElement('div');
-                const photos = await dbGetPhotosForTask(task.id);
-
-                let statusBgClass = '';
-                let statusBadgeClass = '';
-
-                if (task.status === STATUS_TYPES.AWAITED) {
-                    statusBgClass = 'border-l-4 border-l-amber-500 bg-white dark:bg-slate-800';
-                    statusBadgeClass = 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800';
-                } else if (task.status === STATUS_TYPES.COLLECTED) {
-                    statusBgClass = 'border-l-4 border-l-emerald-500 bg-emerald-50/20 dark:bg-slate-800/80';
-                    statusBadgeClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
-                } else if (task.status === STATUS_TYPES.NO_ENTRY) {
-                    statusBgClass = 'border-l-4 border-l-rose-500 bg-rose-50/20 dark:bg-slate-800';
-                    statusBadgeClass = 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border-rose-200 dark:border-rose-800';
-                }
-
-                card.className = `${statusBgClass} rounded-2xl p-3.5 shadow-sm border border-slate-200/80 dark:border-slate-700/80 space-y-3 transition`;
-
-                let photosThumbnailsHTML = '';
-                if (photos.length > 0) {
-                    const thumbElements = photos.map(p => {
-                        const imgUrl = URL.createObjectURL(p.blob);
-                        return `
-                            <div class="relative group w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 shrink-0">
-                                <img src="${imgUrl}" alt="Watermarked Report" onclick="openLightbox('${p.id}', '${escapeHtml(task.patientName)}')" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition">
-                            </div>
-                        `;
-                    }).join('');
-
-                    photosThumbnailsHTML = `
-                        <div class="pt-1">
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1 flex items-center gap-1">
-                                <i data-lucide="image" class="w-3 h-3 text-emerald-500"></i> Watermarked Photos (${photos.length}):
-                            </label>
-                            <div class="flex items-center gap-2 overflow-x-auto pb-1">
-                                ${thumbElements}
-                            </div>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">${escapeHtml(task.patientName)}</h3>
-                                <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${statusBadgeClass} border">
-                                    ${task.status}
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                <span><strong class="font-medium">Bed:</strong> ${escapeHtml(task.bedNo)}</span>
-                                <span>•</span>
-                                <span><strong class="font-medium">CR:</strong> ${escapeHtml(task.crNo)}</span>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <button onclick="triggerCameraForTask('${task.id}')" class="p-1.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 rounded-xl text-xs font-semibold flex items-center gap-1 active-touch transition" title="Snap & Watermark Photo">
-                                <i data-lucide="camera" class="w-3.5 h-3.5"></i> Camera
-                            </button>
-                            <button onclick="openEditModal('${task.id}')" class="p-1 text-slate-400 hover:text-emerald-600 transition" title="Edit Entry">
-                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                            </button>
-                            <button onclick="deleteTask('${task.id}')" class="p-1 text-slate-400 hover:text-rose-600 transition" title="Delete Task">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-1.5">
-                        ${task.tests.map(test => `
-                            <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-md border border-slate-200/60 dark:border-slate-600/60">
-                                ${escapeHtml(test)}
-                            </span>
-                        `).join('')}
-                    </div>
-
-                    ${photosThumbnailsHTML}
-
-                    <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-1">
-                        <span class="text-[11px] font-semibold text-slate-400">Status:</span>
-                        <div class="flex items-center gap-1">
-                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.AWAITED}')"
-                                class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.AWAITED
-                                    ? 'bg-amber-500 text-white shadow-sm font-semibold'
-                                    : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/40'
-                                }">
-                                <i data-lucide="clock" class="w-3 h-3"></i> Awaited
-                            </button>
-
-                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.COLLECTED}')"
-                                class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.COLLECTED
-                                    ? 'bg-emerald-600 text-white shadow-sm font-semibold'
-                                    : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/40'
-                                }">
-                                <i data-lucide="check-circle" class="w-3 h-3"></i> Collected
-                            </button>
-
-                            <button onclick="updateTaskStatus('${task.id}', '${STATUS_TYPES.NO_ENTRY}')"
-                                class="px-2.5 py-1 text-xs font-medium rounded-xl transition flex items-center gap-1 active-touch ${
-                                    task.status === STATUS_TYPES.NO_ENTRY
-                                    ? 'bg-rose-600 text-white shadow-sm font-semibold'
-                                    : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-rose-100 dark:hover:bg-rose-950/40'
-                                }">
-                                <i data-lucide="alert-circle" class="w-3 h-3"></i> No Entry
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                taskListContainer.appendChild(card);
-            }
-
-            lucide.createIcons();
-        }
-
-        window.updateTaskStatus = async function(taskId, newStatus) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.status = newStatus;
-                await dbSaveTask(task);
-                await renderTaskList();
-                showToast(`Status updated: ${newStatus}`);
-            }
+          }
         };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
-        window.deleteTask = async function(taskId) {
-            tasks = tasks.filter(t => t.id !== taskId);
-            await dbDeleteTask(taskId);
-            await renderTaskList();
-            showToast('Task removed');
+    function loadTaskPhotos(taskId, photoIds) {
+      if (!db) return;
+      const tx = db.transaction("photos", "readonly");
+      const store = tx.objectStore("photos");
+      const container = document.getElementById(`photos-container-${taskId}`);
+      if (!container) return;
+
+      container.innerHTML = "";
+      photoIds.forEach(id => {
+        const req = store.get(id);
+        req.onsuccess = (e) => {
+          if (e.target.result) {
+            const img = document.createElement("img");
+            img.src = e.target.result.data;
+            img.className = "photo-thumb";
+            img.onclick = () => openLightbox(taskId, id, e.target.result.data);
+            container.appendChild(img);
+          }
         };
+      });
+    }
 
-        window.openEditModal = function(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (!task) return;
+    // Lightbox Viewing Functions
+    function openLightbox(taskId, photoId, dataUrl) {
+      activeLightboxPhoto = { taskId, photoId, rotation: 0 };
+      const img = document.getElementById("lightbox-img");
+      img.src = dataUrl;
+      img.style.transform = "rotate(0deg)";
+      
+      const task = tasks.find(t => t.id === taskId);
+      document.getElementById("lightbox-title").textContent = task ? task.name : "Report Photo";
+      document.getElementById("lightbox-modal").classList.add("active");
+    }
 
-            editTaskId.value = task.id;
-            editPatientName.value = task.patientName;
-            editBedNo.value = task.bedNo;
-            editCrNo.value = task.crNo;
-            editTestsString.value = task.tests.join(', ');
+    function rotatePhoto() {
+      if (!activeLightboxPhoto) return;
+      activeLightboxPhoto.rotation = (activeLightboxPhoto.rotation + 90) % 360;
+      document.getElementById("lightbox-img").style.transform = `rotate(${activeLightboxPhoto.rotation}deg)`;
+    }
 
-            editTaskModal.classList.remove('hidden');
+    function deletePhoto() {
+      if (!activeLightboxPhoto || !confirm("Delete this photo?")) return;
+      const { taskId, photoId } = activeLightboxPhoto;
+      
+      if (db) {
+        const tx = db.transaction("photos", "readwrite");
+        tx.objectStore("photos").delete(photoId);
+        tx.oncomplete = () => {
+          const task = tasks.find(t => t.id === taskId);
+          if (task) {
+            task.photoIds = task.photoIds.filter(id => id !== photoId);
+            saveTasks();
+          }
+          closeLightbox();
         };
+      }
+    }
 
-        editTaskForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = editTaskId.value;
-            const task = tasks.find(t => t.id === id);
+    function closeLightbox() {
+      document.getElementById("lightbox-modal").classList.remove("active");
+      activeLightboxPhoto = null;
+    }
 
-            if (task) {
-                task.patientName = editPatientName.value.trim();
-                task.bedNo = editBedNo.value.trim() || 'N/A';
-                task.crNo = editCrNo.value.trim() || 'N/A';
-                task.tests = editTestsString.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    // Clean WhatsApp Handover Text Generator
+    function copyWhatsAppText() {
+      if (tasks.length === 0) {
+        alert("No entries to copy");
+        return;
+      }
 
-                await dbSaveTask(task);
-                await renderTaskList();
-                editTaskModal.classList.add('hidden');
-                showToast('Entry updated');
-            }
+      const today = new Date().toLocaleDateString("en-IN", { day: '2-digit', month: 'short' });
+      let text = `📋 *LAB / RADIOLOGY REPORT HANDOVER* (${today})\n------------------------------------\n\n`;
+
+      const collected = tasks.filter(t => t.status === "Collected");
+      const awaited = tasks.filter(t => t.status === "Awaited");
+      const noentry = tasks.filter(t => t.status === "No Entry");
+
+      if (collected.length > 0) {
+        text += `🟢 *COLLECTED (${collected.length}):*\n`;
+        collected.forEach(t => {
+          const bedStr = t.bed ? ` (Bed ${t.bed})` : '';
+          const testsStr = t.tests.join(", ") || "Report";
+          text += `• *${t.name}*${bedStr}: ${testsStr}\n`;
         });
+        text += `\n`;
+      }
 
-        closeEditModalBtn.addEventListener('click', () => editTaskModal.classList.add('hidden'));
-        cancelEditBtn.addEventListener('click', () => editTaskModal.classList.add('hidden'));
-
-        clearCompletedBtn.addEventListener('click', async () => {
-            const collected = tasks.filter(t => t.status === STATUS_TYPES.COLLECTED);
-            if (collected.length === 0) {
-                showToast('No collected tasks to clear');
-                return;
-            }
-            for (const t of collected) {
-                await dbDeleteTask(t.id);
-            }
-            tasks = tasks.filter(t => t.status !== STATUS_TYPES.COLLECTED);
-            await renderTaskList();
-            showToast('Collected tasks cleared');
+      if (awaited.length > 0) {
+        text += `🟡 *AWAITED (${awaited.length}):*\n`;
+        awaited.forEach(t => {
+          const bedStr = t.bed ? ` (Bed ${t.bed})` : '';
+          const testsStr = t.tests.join(", ") || "Report";
+          text += `• *${t.name}*${bedStr}: ${testsStr}\n`;
         });
+        text += `\n`;
+      }
 
-        function renderMasterTestListInModal() {
-            masterTestListContainer.innerHTML = '';
-            masterTestCount.textContent = masterTests.length;
-
-            masterTests.forEach((test, idx) => {
-                const row = document.createElement('div');
-                row.className = "flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs";
-                row.innerHTML = `
-                    <span class="font-medium text-slate-700 dark:text-slate-200">${escapeHtml(test)}</span>
-                    <button onclick="deleteMasterTest(${idx})" class="p-1 text-slate-400 hover:text-rose-600 transition">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    </button>
-                `;
-                masterTestListContainer.appendChild(row);
-            });
-            lucide.createIcons();
-        }
-
-        window.deleteMasterTest = function(index) {
-            masterTests.splice(index, 1);
-            saveMasterTests();
-            renderMasterTestListInModal();
-            showToast('Test removed from dropdown list');
-        };
-
-        addMasterTestBtn.addEventListener('click', () => {
-            const val = newMasterTestInput.value.trim();
-            if (val) {
-                if (!masterTests.includes(val)) {
-                    masterTests.push(val);
-                    saveMasterTests();
-                    renderMasterTestListInModal();
-                    newMasterTestInput.value = '';
-                    showToast(`Added "${val}" to master list`);
-                } else {
-                    showToast('Test already exists');
-                }
-            }
+      if (noentry.length > 0) {
+        text += `🔴 *NO ENTRY / NOT SAMPLED (${noentry.length}):*\n`;
+        noentry.forEach(t => {
+          const bedStr = t.bed ? ` (Bed ${t.bed})` : '';
+          const testsStr = t.tests.join(", ") || "Report";
+          text += `• *${t.name}*${bedStr}: ${testsStr}\n`;
         });
+      }
 
-        resetDefaultTestsBtn.addEventListener('click', () => {
-            masterTests = [...DEFAULT_TESTS];
-            saveMasterTests();
-            renderMasterTestListInModal();
-            showToast('Reset to default tests');
-        });
+      navigator.clipboard.writeText(text.trim()).then(() => {
+        alert("Clean Handover summary copied to clipboard! Ready to paste on WhatsApp.");
+      }).catch(() => {
+        alert("Failed to copy automatically. Please try again.");
+      });
+    }
 
-        manageTestsBtn.addEventListener('click', () => {
-            renderMasterTestListInModal();
-            testManagerModal.classList.remove('hidden');
-        });
+    function clearCollectedTasks() {
+      if (confirm("Clear all 'Collected' entries from your active list?")) {
+        tasks = tasks.filter(t => t.status !== "Collected");
+        saveTasks();
+      }
+    }
 
-        closeModalBtn.addEventListener('click', () => testManagerModal.classList.add('hidden'));
-        doneModalBtn.addEventListener('click', () => testManagerModal.classList.add('hidden'));
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove("active");
+    }
 
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', async () => {
-                filterBtns.forEach(b => {
-                    b.classList.remove('active-filter', 'bg-slate-800', 'text-white', 'dark:bg-slate-100', 'dark:text-slate-900');
-                    b.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
-                });
-
-                btn.classList.add('active-filter', 'bg-slate-800', 'text-white', 'dark:bg-slate-100', 'dark:text-slate-900');
-                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
-
-                currentFilter = btn.getAttribute('data-filter');
-                await renderTaskList();
-            });
-        });
-
-        searchInput.addEventListener('input', async (e) => {
-            searchQuery = e.target.value.trim();
-            await renderTaskList();
-        });
-
-        function showToast(msg) {
-            toastMsg.textContent = msg;
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            toast.classList.add('opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('opacity-100');
-                toast.classList.add('opacity-0', 'pointer-events-none');
-            }, 2500);
-        }
-
-        function initTheme() {
-            const savedTheme = localStorage.getItem('intern_theme');
-            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                themeIcon.setAttribute('data-lucide', 'sun');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeIcon.setAttribute('data-lucide', 'moon');
-            }
-            lucide.createIcons();
-        }
-
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('intern_theme', isDark ? 'dark' : 'light');
-            themeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-            lucide.createIcons();
-        });
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/[&<>"']/g, function(m) {
-                return {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                }[m];
-            });
-        }
-    </script>
+    // Register Inline ServiceWorker safely for offline PWA
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      const swCode = `
+        const CACHE_NAME = 'report-tracker-v1';
+        self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./']))));
+        self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+    }
+  </script>
 </body>
 </html>
