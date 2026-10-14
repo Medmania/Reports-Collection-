@@ -448,7 +448,6 @@
                     const req = store.getAll();
                     req.onsuccess = () => {
                         const rawTasks = req.result || [];
-                        // Ensure legacy string tests are converted to objects with individual statuses
                         const formattedTasks = rawTasks.map(t => {
                             if (Array.isArray(t.tests)) {
                                 t.tests = t.tests.map(testObj => {
@@ -734,7 +733,7 @@
 
         function calculateOverallTaskStatus(task) {
             if (!task.tests || task.tests.length === 0) return STATUS_TYPES.AWAITED;
-            const statuses = task.tests.map(t => typeof t === 'string' ? STATUS_TYPES.AWAITED : t.status);
+            const statuses = task.tests.map(t => typeof t === 'string' ? STATUS_TYPES.AWAITED : (t.status || STATUS_TYPES.AWAITED));
             
             const allCollected = statuses.every(s => s === STATUS_TYPES.COLLECTED);
             if (allCollected) return STATUS_TYPES.COLLECTED;
@@ -820,13 +819,12 @@
 
             activeTaskCameraId = taskId;
 
-            // If task has multiple tests, prompt user which test this photo is for!
             if (task.tests && task.tests.length > 1) {
                 photoTestSelectOptions.innerHTML = '';
 
                 task.tests.forEach(testObj => {
                     const testName = typeof testObj === 'string' ? testObj : testObj.name;
-                    const testStatus = typeof testObj === 'string' ? STATUS_TYPES.AWAITED : testObj.status;
+                    const testStatus = typeof testObj === 'string' ? STATUS_TYPES.AWAITED : (testObj.status || STATUS_TYPES.AWAITED);
 
                     const btn = document.createElement('button');
                     btn.type = 'button';
@@ -845,7 +843,6 @@
                     photoTestSelectOptions.appendChild(btn);
                 });
 
-                // Option for All Tests in 1 photo
                 const allBtn = document.createElement('button');
                 allBtn.type = 'button';
                 allBtn.className = 'w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold text-center active-touch transition shadow-sm mt-1';
@@ -899,10 +896,10 @@
 
                         if (activeSelectedTestForPhoto === 'ALL' || !activeSelectedTestForPhoto) {
                             task.tests.forEach(t => t.status = STATUS_TYPES.COLLECTED);
-                            extraNote = task.tests.map(t => t.name).join(', ');
+                            extraNote = task.tests.map(t => typeof t === 'string' ? t : t.name).join(', ');
                         } else {
-                            const targetTest = task.tests.find(t => t.name === activeSelectedTestForPhoto);
-                            if (targetTest) {
+                            const targetTest = task.tests.find(t => (typeof t === 'string' ? t : t.name) === activeSelectedTestForPhoto);
+                            if (targetTest && typeof targetTest === 'object') {
                                 targetTest.status = STATUS_TYPES.COLLECTED;
                             }
                             extraNote = activeSelectedTestForPhoto;
@@ -1034,9 +1031,12 @@
             tasks.forEach(t => {
                 const bedStr = (t.bedNo && t.bedNo !== 'N/A') ? ` (Bed ${t.bedNo})` : '';
 
-                const colForTask = t.tests.filter(x => x.status === STATUS_TYPES.COLLECTED).map(x => x.name);
-                const awkForTask = t.tests.filter(x => x.status === STATUS_TYPES.AWAITED).map(x => x.name);
-                const noeForTask = t.tests.filter(x => x.status === STATUS_TYPES.NO_ENTRY).map(x => x.name);
+                const getTestName = (x) => typeof x === 'string' ? x : (x.name || '');
+                const getTestStatus = (x) => typeof x === 'string' ? STATUS_TYPES.AWAITED : (x.status || STATUS_TYPES.AWAITED);
+
+                const colForTask = t.tests.filter(x => getTestStatus(x) === STATUS_TYPES.COLLECTED).map(getTestName);
+                const awkForTask = t.tests.filter(x => getTestStatus(x) === STATUS_TYPES.AWAITED).map(getTestName);
+                const noeForTask = t.tests.filter(x => getTestStatus(x) === STATUS_TYPES.NO_ENTRY).map(getTestName);
 
                 if (colForTask.length > 0) {
                     collectedItems.push(`• *${t.patientName}*${bedStr}: ${colForTask.join(', ')}`);
@@ -1065,7 +1065,7 @@
             }
 
             text += `------------------------------------`;
-            return text;
+            return text.trim();
         }
 
         copyHandoverBtn.addEventListener('click', async () => {
@@ -1078,40 +1078,79 @@
         });
 
         shareWhatsAppBtn.addEventListener('click', async () => {
-            const text = await buildHandoverText();
-            if (!text) {
+            if (tasks.length === 0) {
                 showToast('No tasks to share');
                 return;
             }
 
+            showToast('Preparing handover & photos...');
+
+            const text = await buildHandoverText();
             const files = [];
-            for (const t of tasks) {
-                const photos = await dbGetPhotosForTask(t.id);
-                for (let i = 0; i < photos.length; i++) {
-                    const p = photos[i];
-                    if (p.blob) {
-                        const file = new File([p.blob], `${t.patientName.replace(/\s+/g, '_')}_report_${i+1}.jpg`, { type: 'image/jpeg' });
-                        files.push(file);
+
+            try {
+                for (const t of tasks) {
+                    const photos = await dbGetPhotosForTask(t.id);
+                    for (let i = 0; i < photos.length; i++) {
+                        const p = photos[i];
+                        if (p && p.blob) {
+                            const cleanName = t.patientName.replace(/[^a-zA-Z0-9]/g, '_');
+                            const file = new File([p.blob], `${cleanName}_report_${i + 1}.jpg`, { 
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            files.push(file);
+                        }
                     }
+                }
+            } catch (err) {
+                console.warn('Error reading photos:', err);
+            }
+
+            // Attempt Native Web Share API (Mobile standard)
+            if (navigator.share && files.length > 0) {
+                try {
+                    if (navigator.canShare && navigator.canShare({ files: files })) {
+                        await navigator.share({
+                            title: 'Lab Report Handover',
+                            text: text,
+                            files: files
+                        });
+                        showToast('Shared successfully!');
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') {
+                        showToast('Share cancelled');
+                        return;
+                    }
+                    console.warn('Web Share failed, falling back:', e);
                 }
             }
 
-            if (navigator.canShare && files.length > 0 && navigator.canShare({ files: files })) {
-                try {
-                    await navigator.share({
-                        title: 'Lab Report Handover',
-                        text: text,
-                        files: files
-                    });
-                } catch(e) {}
-            } else {
-                copyToClipboard(text);
-                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                window.open(waUrl, '_blank');
-            }
+            // Fallback for browsers blocking multi-file popups
+            copyToClipboard(text);
+            showToast('Text copied! Redirecting to WhatsApp...');
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            
+            setTimeout(() => {
+                window.location.href = waUrl;
+            }, 300);
         });
 
         function copyToClipboard(str) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(str).then(() => {
+                    showToast('Handover copied! Ready to paste in WhatsApp');
+                }).catch(() => {
+                    fallbackCopy(str);
+                });
+            } else {
+                fallbackCopy(str);
+            }
+        }
+
+        function fallbackCopy(str) {
             const el = document.createElement('textarea');
             el.value = str;
             el.setAttribute('readonly', '');
@@ -1243,18 +1282,23 @@
             const task = tasks.find(t => t.id === taskId);
             if (!task || !task.tests[testIndex]) return;
 
-            const current = task.tests[testIndex].status;
+            const current = typeof task.tests[testIndex] === 'string' ? STATUS_TYPES.AWAITED : task.tests[testIndex].status;
             let next = STATUS_TYPES.COLLECTED;
             if (current === STATUS_TYPES.AWAITED) next = STATUS_TYPES.COLLECTED;
             else if (current === STATUS_TYPES.COLLECTED) next = STATUS_TYPES.NO_ENTRY;
             else if (current === STATUS_TYPES.NO_ENTRY) next = STATUS_TYPES.AWAITED;
 
-            task.tests[testIndex].status = next;
+            if (typeof task.tests[testIndex] === 'string') {
+                task.tests[testIndex] = { name: task.tests[testIndex], status: next };
+            } else {
+                task.tests[testIndex].status = next;
+            }
+
             task.status = calculateOverallTaskStatus(task);
 
             await dbSaveTask(task);
             await renderTaskList();
-            showToast(`${task.tests[testIndex].name}: ${next}`);
+            showToast(`${typeof task.tests[testIndex] === 'string' ? task.tests[testIndex] : task.tests[testIndex].name}: ${next}`);
         };
 
         async function renderTaskList() {
@@ -1263,13 +1307,13 @@
             const filteredTasks = tasks.filter(task => {
                 const overallStatus = calculateOverallTaskStatus(task);
                 const matchesFilter = (currentFilter === 'all') || 
-                                      (task.tests.some(t => t.status === currentFilter)) ||
+                                      (task.tests.some(t => (typeof t === 'string' ? STATUS_TYPES.AWAITED : t.status) === currentFilter)) ||
                                       (overallStatus === currentFilter);
                 const query = searchQuery.toLowerCase();
                 const matchesSearch = task.patientName.toLowerCase().includes(query) ||
                                       (task.crNo && task.crNo.toLowerCase().includes(query)) ||
                                       (task.bedNo && task.bedNo.toLowerCase().includes(query)) ||
-                                      task.tests.some(t => t.name.toLowerCase().includes(query));
+                                      task.tests.some(t => (typeof t === 'string' ? t : t.name).toLowerCase().includes(query));
                 return matchesFilter && matchesSearch;
             });
 
@@ -1358,18 +1402,21 @@
                         <span class="text-[10px] font-semibold text-slate-400">Tap test chip to toggle status:</span>
                         <div class="flex flex-wrap gap-1.5">
                             ${task.tests.map((test, idx) => {
+                                const testName = typeof test === 'string' ? test : test.name;
+                                const testStatus = typeof test === 'string' ? STATUS_TYPES.AWAITED : (test.status || STATUS_TYPES.AWAITED);
+
                                 let chipClass = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-200 dark:border-amber-800';
-                                if (test.status === STATUS_TYPES.COLLECTED) {
+                                if (testStatus === STATUS_TYPES.COLLECTED) {
                                     chipClass = 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-200 dark:border-emerald-800';
-                                } else if (test.status === STATUS_TYPES.NO_ENTRY) {
+                                } else if (testStatus === STATUS_TYPES.NO_ENTRY) {
                                     chipClass = 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-800';
                                 }
                                 return `
                                     <button onclick="toggleIndividualTestStatus('${task.id}',${idx})" 
                                         class="px-2.5 py-1 text-xs font-semibold rounded-lg border transition active-touch flex items-center gap-1 ${chipClass}"
                                         title="Tap to change status">
-                                        <span>${escapeHtml(test.name)}</span>
-                                        <span class="text-[9px] opacity-75 font-normal">(${test.status})</span>
+                                        <span>${escapeHtml(testName)}</span>
+                                        <span class="text-[9px] opacity-75 font-normal">(${testStatus})</span>
                                     </button>
                                 `;
                             }).join('')}
@@ -1421,7 +1468,9 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.status = newStatus;
-                task.tests.forEach(t => t.status = newStatus);
+                task.tests.forEach(t => {
+                    if (typeof t === 'object') t.status = newStatus;
+                });
                 await dbSaveTask(task);
                 await renderTaskList();
                 showToast(`All tests marked: ${newStatus}`);
@@ -1443,7 +1492,7 @@
             editPatientName.value = task.patientName;
             editBedNo.value = (task.bedNo && task.bedNo !== 'N/A') ? task.bedNo : '';
             editCrNo.value = (task.crNo && task.crNo !== 'N/A') ? task.crNo : '';
-            editTestsString.value = task.tests.map(t => t.name).join(', ');
+            editTestsString.value = task.tests.map(t => typeof t === 'string' ? t : t.name).join(', ');
 
             editTaskModal.classList.remove('hidden');
         };
@@ -1460,8 +1509,9 @@
 
                 const newTestNames = editTestsString.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
                 task.tests = newTestNames.map(name => {
-                    const existing = task.tests.find(t => t.name === name);
-                    return existing || { name: name, status: STATUS_TYPES.AWAITED };
+                    const existing = task.tests.find(t => (typeof t === 'string' ? t : t.name) === name);
+                    if (typeof existing === 'object') return existing;
+                    return { name: name, status: STATUS_TYPES.AWAITED };
                 });
 
                 task.status = calculateOverallTaskStatus(task);
