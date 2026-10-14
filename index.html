@@ -611,8 +611,8 @@
                     const dateStr = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
                     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                    const line1Text = `PATIENT: ${patientName.toUpperCase()} | REPORT SNAP`;
-                    const line2Text = `${dateStr} ${timeStr} ${additionalInfo ? '| ' + additionalInfo : ''} | Intern Report Tracker`;
+                    const line1Text = `PATIENT: ${patientName.toUpperCase()} | `;
+                    const line2Text = `${dateStr} ${timeStr} ${additionalInfo ? '| ' + additionalInfo : ''} |`;
 
                     const fontSizeLine1 = Math.max(16, Math.round(bannerHeight * 0.32));
                     const fontSizeLine2 = Math.max(12, Math.round(bannerHeight * 0.22));
